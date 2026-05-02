@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-cream text-black font-body;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Mailchimp embedded form overrides — match DUFC design system */
+.mailchimp-wrapper #mc_embed_signup {
+  background: transparent !important;
+  font-family: var(--font-inter), system-ui, sans-serif !important;
+}
+
+.mailchimp-wrapper input[type="email"] {
+  @apply w-full px-4 py-3 border border-grey-mid rounded-md font-body text-base
+         focus:outline-none focus:ring-2 focus:ring-red bg-white text-black;
+}
+
+.mailchimp-wrapper input[type="submit"] {
+  @apply bg-red text-white px-6 py-3 rounded-md font-body font-medium text-sm
+         uppercase tracking-wide hover:bg-red-dark cursor-pointer transition-colors mt-3 w-full;
+}
+
+.mailchimp-wrapper label {
+  @apply font-body text-sm font-medium text-grey-dark;
+}
+
+.mailchimp-wrapper .mc-field-group {
+  @apply mb-4;
+}

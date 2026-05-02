@@ -53,7 +53,7 @@ export async function getCommitteeMembers(): Promise<CommitteeMember[]> {
   try {
     const rows = await getSheetValues('Committee!A:G')
     return rows
-      .filter(row => (row[6] ?? '').toUpperCase() === 'TRUE') // active column
+      .filter(row => (row[6] ?? '').trim().toUpperCase() !== 'FALSE') // optional legacy "active" column G
       .map(row => ({
         name: row[0] ?? '',
         role: row[1] ?? '',

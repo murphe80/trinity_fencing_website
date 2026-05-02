@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import PageHeroWatermark from '@/components/layout/PageHeroWatermark'
 import AchievementsClient from '@/components/achievements/AchievementsClient'
 import OlympiansSection from '@/components/achievements/OlympiansSection'
 import { getAchievements } from '@/lib/google-sheets'
@@ -62,9 +63,7 @@ export default async function AchievementsPage() {
     <div className="bg-cream min-h-screen">
       {/* Page hero */}
       <div className="bg-black relative overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-end pr-16 opacity-5 pointer-events-none select-none">
-          <span className="font-heading text-white text-[20rem] font-bold leading-none">D</span>
-        </div>
+        <PageHeroWatermark />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <h1 className="font-heading text-4xl md:text-5xl font-semibold text-white">
             Achievements

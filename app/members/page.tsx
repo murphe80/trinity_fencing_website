@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import PageHeroWatermark from '@/components/layout/PageHeroWatermark'
 import PersonCard from '@/components/members/PersonCard'
 import CoachCard from '@/components/members/CoachCard'
 import { getCommitteeMembers, getCoach, getHonoraryMembers } from '@/lib/google-sheets'
@@ -11,14 +12,33 @@ export const metadata: Metadata = {
 }
 
 const ALUMNI_CAPTAINS = [
-  { year: '2024/25', captain: 'Liam Zone', womensCaptain: 'Aoife Ryan' },
-  { year: '2023/24', captain: 'Ciarán Walsh', womensCaptain: 'Emma Murphy' },
-  { year: '2022/23', captain: 'Tom Keane', womensCaptain: 'Sophie Brennan' },
-  { year: '2021/22', captain: 'Ben Murray', womensCaptain: 'Katie Lynch' },
-  { year: '2020/21', captain: 'Jack Doyle', womensCaptain: 'Niamh Burke' },
-  { year: '2019/20', captain: 'Roisín Forde', womensCaptain: 'Sarah Healy' },
-  { year: '2018/19', captain: 'Michael Stafford', womensCaptain: 'Orla Quinn' },
-  { year: '2017/18', captain: 'Declan Hayes', womensCaptain: 'Ciara Byrne' },
+    { year: '2026/27', captain: 'Emma Murphy', womensCaptain: 'James McCartney' },
+    { year: '2025/26', captain: 'Liam Zone', womensCaptain: 'Katie Lynch' },
+    { year: '2024/25', captain: 'Katie Lynch', womensCaptain: 'Cathal Maguire' },
+    { year: '2023/24', captain: 'Adri Hrabowych', womensCaptain: 'William Mac Donald Hughes' },
+    { year: '2022/23', captain: 'Cathal Maguire', womensCaptain: 'Isabelle Clarke' },
+    { year: '2021/22', captain: 'James Cole', womensCaptain: 'Crystal Percival' },
+    { year: '2020/21', captain: 'Angie Parissi', womensCaptain: 'Luke Dowling' },
+    { year: '2019/20', captain: 'Stephen Grogan', womensCaptain: 'Dearbhaile Collins' },
+    { year: '2018/19', captain: 'Bethany Rush', womensCaptain: 'Donncdha Carroll' },
+    { year: '2017/18', captain: 'Sam Mitchell', womensCaptain: 'Manon Nouvian' },
+    { year: '2016/17', captain: 'James Bryant', womensCaptain: 'Lucy Johnson' },
+    { year: '2015/16', captain: 'Sean Healy', womensCaptain: 'Olivia Murray' },
+    { year: '2014/15', captain: 'Tadhg Garton', womensCaptain: 'Rebecca Ryan' },
+    { year: '2013/14', captain: 'Maxton Milner', womensCaptain: 'Emily Greenan' },
+    { year: '2012/13', captain: 'Conor Traynor', womensCaptain: 'Clodagh McCarthy Luddy' },
+    { year: '2011/12', captain: 'Edward Mitchell', womensCaptain: 'Hannah Lowry O\'Reilly' },
+    { year: '2010/11', captain: 'Alexander Kelly', womensCaptain: 'Helen Naddy' },
+    { year: '2009/10', captain: 'Declan Gibbons', womensCaptain: 'Liz Fitzgerald' },
+    { year: '2008/09', captain: 'Louis Arron', womensCaptain: 'Kate Harvey' },
+    { year: '2007/08', captain: 'Lachlan Sykes', womensCaptain: 'Maria Treacy' },
+    { year: '2006/07', captain: 'Colin Couper' },
+    { year: '2005/06', captain: 'Aoife Brown', womensCaptain: 'Colm Flynn' },
+    { year: '2004/05', captain: 'Colm Flynn', womensCaptain: 'Kate Harvey' },
+    { year: '2003/04', captain: 'James Stratford' },
+    { year: '2002/03', captain: 'Ken Suzuki' },
+    { year: '2001/02', captain: 'Suzanne Clayton' },
+    { year: '2000/01', captain: 'Nat O\'Connor' }
 ]
 
 export default async function MembersPage() {
@@ -32,9 +52,7 @@ export default async function MembersPage() {
     <div className="bg-cream min-h-screen">
       {/* Page hero */}
       <div className="bg-black relative overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-end pr-16 opacity-5 pointer-events-none select-none">
-          <span className="font-heading text-white text-[20rem] font-bold leading-none">D</span>
-        </div>
+        <PageHeroWatermark />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <h1 className="font-heading text-4xl md:text-5xl font-semibold text-white">
             The Club

@@ -53,12 +53,12 @@ export default async function MembersPage() {
       {/* Page hero */}
       <div className="bg-black relative overflow-hidden">
         <PageHeroWatermark />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-25 pb-16 md:pt-24 md:pb-20">
           <h1 className="font-heading text-4xl md:text-5xl font-semibold text-white">
             The Club
           </h1>
           <p className="font-body text-white/60 mt-3 text-lg">
-            Meet the people who make DUFC what it is.
+            Meet the people behind DUFC! 
           </p>
         </div>
       </div>
@@ -68,7 +68,7 @@ export default async function MembersPage() {
         {/* Coach */}
         {coach && (
           <section>
-            <h2 className="font-heading text-3xl font-semibold text-black mb-6">Coaching Staff</h2>
+            <h2 className="font-heading text-3xl font-semibold text-black mb-6">Coaching</h2>
             <CoachCard coach={coach} />
           </section>
         )}

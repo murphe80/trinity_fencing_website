@@ -47,7 +47,7 @@ export default function RootLayout({
     <html lang="en" className={`${ebGaramond.variable} ${inter.variable}`}>
       <body>
         <Header />
-        <main className="pt-16">
+        <main className="pt-1">
           {children}
         </main>
         <Footer />

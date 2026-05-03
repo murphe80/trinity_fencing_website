@@ -7,7 +7,7 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
     <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col gap-3">
       <div className="flex items-start justify-between gap-3">
         <span className="font-heading text-4xl font-semibold text-red/20 leading-none select-none">
-          {achievement.year.split('/')[0]}
+          {"20" + achievement.year.split('/')[1]}
         </span>
         <Tag label={achievement.level as any} className="flex-shrink-0" />
       </div>

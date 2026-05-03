@@ -31,15 +31,25 @@ export default function Header() {
     <>
       <header
         className={clsx(
-          'fixed top-0 left-0 right-0 z-30 h-16 bg-black transition-shadow duration-200',
-          scrolled && 'shadow-md'
+          'fixed top-0 left-0 right-0 z-30 h-16 transition-all duration-300',
+          // Glassmorphism — always present; opacity deepens on scroll
+          'backdrop-blur-md border-b border-white/10',
+          scrolled
+            ? 'bg-black/80 shadow-md'
+            : 'bg-black/30'
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 flex-shrink-0">
-            <Image src="/images/crest.png" alt="DUFC crest" width={40} height={40} className="flex-shrink-0" />
-            <span className="font-heading text-white text-xl hidden sm:block">
+            <Image
+              src="/images/crest_white.png"
+              alt="DUFC crest"
+              width={36}
+              height={36}
+              className="flex-shrink-0 opacity-90"
+            />
+            <span className="font-heading text-white text-xl hidden sm:block tracking-tight">
               Dublin University Fencing Club
             </span>
             <span className="font-heading text-white text-xl sm:hidden">DUFC</span>

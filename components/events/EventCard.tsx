@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import Tag from '@/components/ui/Tag'
 import type { CalendarEvent } from '@/types'
+import { parseDescriptionWithLinks } from '@/lib/parse-description-links'
 
 interface Props {
   event: CalendarEvent
@@ -40,7 +41,7 @@ export default function EventCard({ event }: Props) {
 
         {event.description && (
           <p className="font-body text-sm text-grey-dark leading-relaxed line-clamp-2">
-            {event.description.replace(/^Tag:.*$/m, '').trim()}
+            {parseDescriptionWithLinks(event.description)}
           </p>
         )}
 

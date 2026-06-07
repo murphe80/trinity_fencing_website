@@ -11,10 +11,14 @@ The website automatically reads events from the **dufencing@gmail.com Google Cal
 1. Open [Google Calendar](https://calendar.google.com) and sign in as **dufencing@gmail.com**
 2. Click the date of your event → click **"More options"** (not just "Save")
 3. Fill in the following fields:
-   - **Title** — e.g. `Leinster Intervarsities 2025`
+   - **Title** — e.g. `Intervarsities 2025`
    - **Date and time** — set the correct start and end times
    - **Location** — e.g. `UCD Sports Centre, Dublin` *(shows on the website)*
    - **Description** — a short summary of the event *(first 150 characters show on the website)*
+     - You can include links in the description using either:
+       - Markdown format: `[link text](https://example.com)`
+       - Plain URLs: `https://example.com`
+     - Links will be automatically made clickable on the website
 4. **Set the event colour** to indicate the type (see colour guide below)
 5. Click **Save**
 

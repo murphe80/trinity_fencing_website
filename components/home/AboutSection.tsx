@@ -12,7 +12,7 @@ export default function AboutSection() {
           <div>
             <ScrollReveal>
               <h2 className="font-heading text-3xl md:text-4xl font-semibold text-black mb-6">
-                Our Story
+                Club History
               </h2>
             </ScrollReveal>
 
@@ -35,9 +35,7 @@ export default function AboutSection() {
 
               <ScrollReveal delay={240}>
                 <p>
-                  Today, DUFC is one of Ireland&apos;s premier fencing clubs, consistently topping the
-                  national club medal table, producing six Olympians, and welcoming students, alumni,
-                  and staff from Trinity College.
+                  Today, DUFC is one of Ireland&apos;s top fencing clubs, welcoming both students and alumni from Trinity College and external fencers from all around the world.
                 </p>
               </ScrollReveal>
             </div>

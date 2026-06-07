@@ -1,8 +1,8 @@
 const STATS = [
   { value: '1774', label: 'Founded' },
-  { value: '6', label: 'Olympians' },
+  { value: '2026', label: 'Varsities Champions' },
   { value: '3', label: 'Weapons' },
-  { value: '2017 & 2025', label: 'Club of the Year' },
+  { value: '2025', label: 'Club of the Year' },
 ]
 
 export default function StatsStrip() {

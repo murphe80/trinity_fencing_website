@@ -34,12 +34,35 @@ export default function EventsClient({ upcoming, past }: Props) {
 
   return (
     <div>
-      {/* Filter bar */}
+      {/* Filter bar + calendar toggle */}
       <div className="sticky top-16 z-20 bg-cream py-4 border-b border-grey-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <EventFilterBar active={activeFilter} onChange={setActiveFilter} />
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
+            <EventFilterBar active={activeFilter} onChange={setActiveFilter} />
+            <button
+              type="button"
+              onClick={() => setShowCalendar(!showCalendar)}
+              className="flex w-fit shrink-0 items-center gap-2 self-start rounded-md border border-grey-light px-4 py-2 font-body text-sm font-medium text-grey-dark transition-colors hover:text-red sm:self-center"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+              {showCalendar ? 'Hide Calendar View' : 'View as Calendar'}
+            </button>
+          </div>
         </div>
       </div>
+
+      {showCalendar && (
+        <div className="border-b border-grey-light bg-cream">
+          <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+            <CalendarEmbed />
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
@@ -64,56 +87,6 @@ export default function EventsClient({ upcoming, past }: Props) {
             ))}
           </div>
         )}
-
-        {/* Past events */}
-        {past.length > 0 && (
-          <div className="mt-16">
-            <button
-              onClick={() => setShowPast(!showPast)}
-              className="flex items-center gap-2 font-heading text-xl text-black hover:text-red transition-colors"
-            >
-              <span>Past Events (this season)</span>
-              <svg
-                width="20" height="20" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="2"
-                className={`transition-transform duration-200 ${showPast ? 'rotate-180' : ''}`}
-              >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </button>
-
-            {showPast && (
-              <div className="mt-4 border border-grey-light rounded-lg p-6">
-                {past.map(event => (
-                  <EventCard key={event.id} event={event} />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Calendar toggle */}
-        <div className="mt-16">
-          <button
-            onClick={() => setShowCalendar(!showCalendar)}
-            className="flex items-center gap-2 font-body text-sm font-medium text-grey-dark hover:text-red transition-colors border border-grey-light rounded-md px-4 py-2"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
-            {showCalendar ? 'Hide Calendar View' : 'View as Calendar'}
-          </button>
-
-          {showCalendar && (
-            <div className="mt-4">
-              <CalendarEmbed />
-            </div>
-          )}
-        </div>
-
       </div>
     </div>
   )

@@ -14,10 +14,7 @@ const FAQ_ITEMS = [
     question: 'What equipment do I need to start?',
     answer: (
       <span>
-        Nothing for your first session. The club lends masks and jackets to beginners.
-        As you progress you&apos;ll want to purchase your own kit. See our{' '}
-        <Link href="/shop" className="text-red hover:underline">Shop page</Link>{' '}
-        for club-branded gear.
+        Nothing! The club has a range of equipment available for club members to use.
       </span>
     ),
   },
@@ -31,12 +28,12 @@ const FAQ_ITEMS = [
     ),
   },
   {
-    question: 'I fenced before at another club — can I join?',
+    question: 'I fenced before at another club, can I join?',
     answer: `Absolutely. Experienced fencers are very welcome. Get in touch via ${SITE_CONFIG.email} to discuss.`,
   },
   {
     question: 'Is there a trial session?',
-    answer: 'Yes, you can attend a taster session before committing to membership. Contact us to arrange.',
+    answer: 'No, for insurance reasons we do not allow trial sessions.',
   },
   {
     question: 'What are the membership fees?',
@@ -54,7 +51,7 @@ const FAQ_ITEMS = [
 const WHAT_TO_EXPECT = [
   {
     title: 'Beginners Welcome',
-    body: 'No prior experience is needed. We provide beginner coaching and can lend equipment for your first few sessions.',
+    body: 'No prior experience is needed. We provide beginner coaching and can lend equipment.',
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
@@ -83,7 +80,7 @@ const WHAT_TO_EXPECT = [
   },
   {
     title: 'All Three Weapons',
-    body: 'Members can train in foil, épée, and sabre. Most beginners start with one weapon and branch out over time.',
+    body: 'Members can train in foil, épée, and sabre. Beginners start with foil and can branch out over time.',
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <line x1="5" y1="19" x2="19" y2="5" />

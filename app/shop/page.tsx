@@ -4,23 +4,10 @@ import { SITE_CONFIG } from '@/lib/constants'
 
 export const metadata: Metadata = {
   title: 'Club Shop',
-  description: 'Official DUFC kit and apparel, powered by McKeever Sports.',
+  description: 'Official DUFC kit available through McKeever Sports',
 }
 
-const WHY_BUY = [
-  {
-    title: 'Represent at Competitions',
-    body: 'Wearing club colours at intervarsities and national competitions shows team pride and helps our fencers stand out on the piste.',
-  },
-  {
-    title: 'Represent Trinity',
-    body: 'As a Trinity College club, our kit carries the college colours. Wearing it is a mark of the university\'s long fencing tradition.',
-  },
-  {
-    title: 'Support the Club',
-    body: 'A portion of every kit sale supports the club directly, helping fund equipment, competition travel, and events.',
-  },
-]
+
 
 export default function ShopPage() {
   return (
@@ -33,7 +20,7 @@ export default function ShopPage() {
             Club Shop
           </h1>
           <p className="font-body text-white/60 mt-3 text-lg">
-            Official DUFC kit and apparel, powered by McKeever Sports.
+            Official DUFC kit available through McKeever Sports.
           </p>
         </div>
       </div>
@@ -57,9 +44,9 @@ export default function ShopPage() {
                   The range includes:
                 </p>
                 <ul className="font-body text-grey-dark mt-3 space-y-1 list-disc list-inside">
-                  <li>Club tracksuits and training tops</li>
-                  <li>Hoodies and casual wear</li>
-                  <li>Polo shirts and competition tops</li>
+                  <li>Club training tops and polos</li>
+                  <li>Jackets and tracksuits</li>
+                  <li>Hats and scarves</li>
                 </ul>
                 <p className="font-body text-sm text-grey-mid mt-4">
                   All items are produced in DUFC colours (red and black) with the club crest.
@@ -79,25 +66,6 @@ export default function ShopPage() {
           </div>
         </section>
 
-        {/* Why Buy */}
-        <section>
-          <h2 className="font-heading text-3xl font-semibold text-black mb-8">
-            Why Buy Club Kit?
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            {WHY_BUY.map((item, i) => (
-              <div key={i} className="flex gap-4">
-                <div className="w-8 h-8 rounded-full bg-red flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-white font-heading font-bold text-sm">{i + 1}</span>
-                </div>
-                <div>
-                  <h3 className="font-heading text-lg font-semibold text-black">{item.title}</h3>
-                  <p className="font-body text-sm text-grey-dark leading-relaxed mt-1">{item.body}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
 
       </div>
     </div>

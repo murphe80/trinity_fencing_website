@@ -69,21 +69,21 @@ export default async function AchievementsPage() {
             Achievements
           </h1>
           <p className="font-body text-white/60 mt-3 text-lg">
-            A record of DUFC&apos;s competitive highlights, season by season.
+            A record of DUFC&apos;s competitive highlights
           </p>
         </div>
       </div>
 
       <AchievementsClient achievements={achievements} />
-
-      <OlympiansSection />
-
-      {/* Pinks Recipients */}
-      <section className="bg-cream py-16">
+        {/* Pinks Recipients */}
+        <section className="bg-cream py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <PinksSection />
         </div>
       </section>
+
+      <OlympiansSection />
+
     </div>
   )
 }

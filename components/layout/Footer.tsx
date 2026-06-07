@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { SITE_CONFIG } from '@/lib/constants'
+import Image from 'next/image'
 
 const QUICK_LINKS = [
   { href: '/', label: 'Home' },
@@ -23,9 +24,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               {/* Crest placeholder */}
-              <div className="w-12 h-12 rounded-full bg-red flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-heading font-bold text-lg">D</span>
-              </div>
+              <Image src="/images/crest_white.png" alt="DUFC crest" width={36} height={36} className="flex-shrink-0 opacity-90" />
               <span className="font-heading text-white text-lg">Dublin University Fencing Club</span>
             </div>
             <p className="font-body text-sm leading-relaxed text-white/60">
@@ -58,7 +57,7 @@ export default function Footer() {
           {/* Column 3: Social & External */}
           <div>
             <h3 className="font-body text-xs font-medium uppercase tracking-widest text-white/40 mb-4">
-              Connect
+              Contact Us
             </h3>
             <ul className="space-y-3">
               <li>

@@ -15,6 +15,14 @@ function getResultStyle(result: string): string {
   return 'text-red font-semibold'
 }
 
+/** Comma-separated placements (e.g. "1st, 1st, 2nd") → one trimmed segment each. */
+function resultSegments(result: string): string[] {
+  return result
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+}
+
 function ResultIcon({ result }: { result: string }) {
   const r = result.toLowerCase()
   if (r.includes('1st') || r.includes('gold') || r.includes('winner')) {
@@ -26,6 +34,9 @@ function ResultIcon({ result }: { result: string }) {
   if (r.includes('3rd') || r.includes('bronze')) {
     return <span className="text-base" aria-hidden>🥉</span>
   }
+  if (r.includes('champions') || r.includes('winners')){
+    return <span className="text-gold text-base" aria-hidden>🏆</span>
+  }
   return null
 }
 
@@ -33,14 +44,23 @@ interface Props {
   achievement: Achievement
 }
 
+const FENCER_PREVIEW_COUNT = 5
+
 export default function AchievementCard({ achievement }: Props) {
   const [expanded, setExpanded] = useState(false)
+  const [fencersExpanded, setFencersExpanded] = useState(false)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
   const imageSrcs = achievement.imageUrls.map(driveUrlToImageSrc)
   const shortDesc = achievement.description.slice(0, 100)
   const hasMore = achievement.description.length > 100
+
+  const fencers = achievement.fencers
+  const needsFencerExpand = fencers.length > FENCER_PREVIEW_COUNT
+  const visibleFencers =
+    needsFencerExpand && !fencersExpanded ? fencers.slice(0, FENCER_PREVIEW_COUNT) : fencers
+  const hiddenFencerCount = fencers.length - FENCER_PREVIEW_COUNT
 
   return (
     <>
@@ -55,35 +75,49 @@ export default function AchievementCard({ achievement }: Props) {
         </div>
 
         <div className="flex-1 bg-white rounded-lg shadow-sm p-5 md:p-6 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-          {/* Header row */}
-          <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
-            <div className="flex flex-wrap gap-2">
-              <Tag label={achievement.level as Parameters<typeof Tag>[0]['label']} />
-              <Tag label={achievement.weapon as Parameters<typeof Tag>[0]['label']} />
+          <div className="flex items-start gap-3 mb-1.5">
+            <h3 className="font-heading text-xl font-medium text-black flex-1 min-w-0">
+              {achievement.eventName}
+            </h3>
+            <Tag
+              label={achievement.weapon as Parameters<typeof Tag>[0]['label']}
+              className="flex-shrink-0 hidden sm:inline-block"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
+            <Tag
+              label={achievement.weapon as Parameters<typeof Tag>[0]['label']}
+              className="sm:hidden flex-shrink-0"
+            />
+            <div
+              className="flex flex-wrap items-center gap-x-1 gap-y-0.5"
+              aria-label={achievement.result}
+            >
+              {resultSegments(achievement.result).map((segment, i) => (
+                <ResultIcon key={`${segment}-${i}`} result={segment} />
+              ))}
             </div>
-            {achievement.featured && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-body font-semibold uppercase tracking-wide text-gold bg-gold/10 px-2 py-0.5 rounded-full">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                Featured
-              </span>
-            )}
           </div>
 
-          <h3 className="font-heading text-xl font-medium text-black">
-            {achievement.eventName}
-          </h3>
-
-          <div className="flex items-center gap-2 mt-1">
-            <ResultIcon result={achievement.result} />
-            <p className={clsx('font-body text-sm', getResultStyle(achievement.result))}>
-              {achievement.result}
-            </p>
-          </div>
-
-          {achievement.fencers.length > 0 && (
-            <p className="font-body text-sm text-grey-dark mt-1">
-              {achievement.fencers.join(', ')}
-            </p>
+          {fencers.length > 0 && (
+            <div className="mt-1">
+              <p className="font-body text-sm text-grey-dark">
+                {visibleFencers.join(', ')}
+                {needsFencerExpand && !fencersExpanded && '…'}
+              </p>
+              {needsFencerExpand && (
+                <button
+                  type="button"
+                  onClick={() => setFencersExpanded(!fencersExpanded)}
+                  className="font-body text-xs text-red font-medium mt-1 hover:text-red-dark transition-colors"
+                >
+                  {fencersExpanded
+                    ? 'Show fewer fencers'
+                    : `Show all ${fencers.length} fencers (${hiddenFencerCount} more)`}
+                </button>
+              )}
+            </div>
           )}
 
           <p className="font-body text-xs text-grey-mid mt-1">{achievement.date}</p>

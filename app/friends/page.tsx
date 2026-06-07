@@ -19,7 +19,7 @@ export default function FriendsPage() {
             Friends of DUFC
           </h1>
           <p className="font-body text-white/60 mt-3 text-lg">
-            Stay connected with the club you helped build.
+            Stay connected with the club
           </p>
         </div>
       </div>
@@ -35,10 +35,7 @@ export default function FriendsPage() {
               </h2>
               <p className="font-body text-grey-dark leading-relaxed mt-4">
                 Stay up to date with club news, competition results, and events.
-                We send a newsletter to our alumni and friends community throughout the season.
-              </p>
-              <p className="font-body text-sm text-grey-mid mt-4">
-                No spam. Unsubscribe at any time.
+                We send a newsletter to our alumni and friends community twice per season.
               </p>
             </div>
 
@@ -82,8 +79,7 @@ export default function FriendsPage() {
           </h2>
           <p className="font-body text-white/70 leading-relaxed mt-5 max-w-2xl mx-auto">
             DUFC is a non-profit student club. Your donations directly fund equipment, competition
-            travel, and hosting the Professor Duffy Memorial Team Épée — one of Ireland&apos;s
-            longest-running fencing tournaments. Every contribution makes a difference.
+            travel, and hosting competitions like the Professor Duffy Memorial Team Épée. Every contribution makes a difference.
           </p>
           <div className="mt-8">
             <a
@@ -99,26 +95,22 @@ export default function FriendsPage() {
         <section>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
             <div>
-              <div className="font-body text-xs text-red uppercase tracking-widest mb-3">
-                Est. 1987 · Annual Tournament
-              </div>
               <h2 className="font-heading text-3xl font-semibold text-black">
                 The Professor Duffy Memorial Team Épée
               </h2>
               <div className="space-y-4 font-body text-grey-dark leading-relaxed mt-5">
                 <p>
-                  Inaugurated in 1987 following the death of Professor Patrick Duffy — DUFC&apos;s
-                  most decorated coach and an Irish Olympian himself — the Prof. Duffy Memorial
+                  Inaugurated in 1987 following the death of Professor Patrick Duffy, the Prof. Duffy Memorial
                   Team Épée has grown into one of Ireland&apos;s most prestigious fencing tournaments.
                 </p>
                 <p>
                   Now in its fourth decade, the tournament attracts international teams from Germany,
                   Italy, and the UK, as well as the top Irish university and club teams. It is held
-                  annually at Trinity Sports Centre in December.
+                  annually in Trinity Sports Centre.
                 </p>
                 <p>
                   The tournament is a key fundraising event for the club and a celebration of DUFC&apos;s
-                  history and international standing in the sport.
+                  history.
                 </p>
               </div>
               <Link
@@ -127,18 +119,6 @@ export default function FriendsPage() {
               >
                 View upcoming tournament dates →
               </Link>
-            </div>
-
-            {/* Historical context box */}
-            <div className="bg-grey-light rounded-lg p-6 md:p-8">
-              <blockquote className="font-heading text-lg text-black leading-relaxed italic">
-                &ldquo;Professor Patrick Duffy coached DUFC from 1952 until his death in 1987,
-                representing Ireland at the 1948 and 1952 Olympic Games. His legacy endures in
-                the annual Professor Duffy Memorial Team Épée Tournament, now in its fourth decade.&rdquo;
-              </blockquote>
-              <div className="mt-4 font-body text-sm text-grey-mid">
-                — Dublin University Fencing Club
-              </div>
             </div>
           </div>
         </section>

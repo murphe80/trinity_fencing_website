@@ -26,7 +26,7 @@ export default async function EventsPage() {
             Events & Calendar
           </h1>
           <p className="font-body text-white/60 mt-3 text-lg">
-            Competitions, training sessions, social events, and alumni days.
+            Competitions, training sessions, social events, and alumni events.
           </p>
         </div>
       </div>

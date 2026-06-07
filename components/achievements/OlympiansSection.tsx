@@ -39,9 +39,9 @@ const OLYMPIANS = [
 
 export default function OlympiansSection() {
   return (
-    <section className="bg-black py-16 md:py-24">
+    <section className="bg-cream py-16 md:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="font-heading text-3xl md:text-4xl font-semibold text-white mb-3">
+        <h2 className="font-heading text-3xl md:text-4xl font-semibold text-black mb-3">
           DUFC Olympians
         </h2>
         <p className="font-body text-white/60 mb-10">

@@ -15,10 +15,14 @@ The website automatically reads events from the **dufencing@gmail.com Google Cal
    - **Date and time** — set the correct start and end times
    - **Location** — e.g. `UCD Sports Centre, Dublin` *(shows on the website)*
    - **Description** — a short summary of the event *(first 150 characters show on the website)*
-     - You can include links in the description using either:
-       - Markdown format: `[link text](https://example.com)`
-       - Plain URLs: `https://example.com`
-     - Links will be automatically made clickable on the website
+     - **To add a clickable link:**
+       1. Type your link text (e.g., "Register here")
+       2. Highlight the text
+       3. Click the link icon (🔗) in the description toolbar
+       4. Paste your URL and click OK
+     - You can also use plain URLs: `https://example.com`
+     - Links will be automatically clickable on the website
+     - Line breaks are supported and will display correctly
 4. **Set the event colour** to indicate the type (see colour guide below)
 5. Click **Save**
 

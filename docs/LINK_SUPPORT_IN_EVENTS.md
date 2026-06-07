@@ -2,12 +2,13 @@
 
 ## Overview
 
-Event descriptions now support clickable links in two formats:
+Event descriptions now support clickable links in three formats:
 
-1. **Markdown-style links**: `[Link text](https://example.com)`
-2. **Plain URLs**: `https://example.com`
+1. **HTML links**: `<a href="https://example.com">Link text</a>` (Google Calendar's default)
+2. **Markdown-style links**: `[Link text](https://example.com)`
+3. **Plain URLs**: `https://example.com`
 
-Links are automatically parsed and rendered as clickable elements in the event cards on the website.
+Links are automatically parsed and rendered as clickable elements in the event cards on the website. Line breaks (`<br>` tags) are also properly rendered.
 
 ---
 
@@ -15,21 +16,30 @@ Links are automatically parsed and rendered as clickable elements in the event c
 
 ### Adding Links in Google Calendar
 
-When creating or editing an event in Google Calendar, you can include links in the description field:
+When creating or editing an event in Google Calendar, you can include links in the description field. Google Calendar automatically converts URLs into HTML links when you use its link insertion tool (the link icon in the toolbar).
 
-**Example 1: Markdown-style link**
+**Example 1: Using Google Calendar's link tool (recommended)**
+1. In the description field, type your text: "Sign up here"
+2. Highlight the text
+3. Click the link icon in the toolbar
+4. Paste the URL: `https://forms.google.com/registration`
+5. Google Calendar will create: `<a href="https://forms.google.com/registration">Sign up here</a>`
+
+**Example 2: Markdown-style link**
 ```
 Join us for training! [Register here](https://forms.google.com/registration)
 ```
 
-**Example 2: Plain URL**
+**Example 3: Plain URL**
 ```
 Join us for training! Registration: https://forms.google.com/registration
 ```
 
-**Example 3: Multiple links**
+**Example 4: Multiple links and line breaks**
 ```
-[Competition details](https://example.com/details) | [Register](https://forms.google.com/register)
+Sign up here: <a href="https://forms.gle/example">https://forms.gle/example</a><br>
+7-7:45pm: S&C with Coach<br>
+7:45-9:30pm: Free fencing
 ```
 
 ### On the Website
@@ -64,10 +74,13 @@ Join us for training! Registration: https://forms.google.com/registration
 
 The parser processes the description string sequentially:
 
-1. **Check for markdown links** `[text](url)` first (to avoid breaking these patterns)
-2. **Check for plain URLs** `https://...` or `http://...`
-3. **Add text between links** as plain `<span>` elements
-4. **Repeat** until the entire string is processed
+1. **Check for HTML links** `<a href="url">text</a>` first (Google Calendar's format)
+2. **Check for markdown links** `[text](url)` second
+3. **Check for plain URLs** `https://...` or `http://...`
+4. **Parse `<br>` tags** in text segments and convert them to React line breaks
+5. **Decode HTML entities** like `&amp;`, `&lt;`, `&gt;`, etc.
+6. **Add text between links** as `<span>` elements
+7. **Repeat** until the entire string is processed
 
 ### Styling
 

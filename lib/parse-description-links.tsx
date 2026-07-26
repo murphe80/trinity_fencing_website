@@ -1,4 +1,11 @@
 import React from 'react'
+import {
+  decodeHtmlEntities,
+  extractFirstDescriptionLink,
+  findNextLinkMatch,
+} from './description-links'
+
+const LINK_CLASS = 'text-red hover:text-red-dark underline transition-colors'
 
 /**
  * Parses event descriptions that may contain:
@@ -17,98 +24,28 @@ export function parseDescriptionWithLinks(description: string): React.ReactNode[
   remaining = remaining.replace(/^Tag:.*$/m, '').trim()
 
   while (remaining.length > 0) {
-    // Try to match HTML anchor tags <a href="url">text</a>
-    const htmlLinkMatch = remaining.match(/<a\s+href=["']([^"']+)["'][^>]*>([^<]+)<\/a>/i)
+    const linkMatch = findNextLinkMatch(remaining)
 
-    if (htmlLinkMatch) {
-      const beforeLink = remaining.substring(0, htmlLinkMatch.index)
-      const linkUrl = htmlLinkMatch[1]
-      const linkText = htmlLinkMatch[2]
-
-      // Add text before the link (parsing any <br> tags)
-      if (beforeLink) {
-        parts.push(...parseTextWithBreaks(beforeLink, key))
-        key += 100 // Increment by a larger amount to avoid key collisions
-      }
-
-      // Add the link
-      parts.push(
-        <a
-          key={`link-${key++}`}
-          href={linkUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-red hover:text-red-dark underline transition-colors"
-        >
-          {linkText}
-        </a>
-      )
-
-      // Continue with the rest
-      remaining = remaining.substring((htmlLinkMatch.index ?? 0) + htmlLinkMatch[0].length)
-      continue
-    }
-
-    // Try to match markdown-style link [text](url)
-    const markdownMatch = remaining.match(/\[([^\]]+)\]\(([^)]+)\)/)
-
-    if (markdownMatch) {
-      const beforeLink = remaining.substring(0, markdownMatch.index)
-      const linkText = markdownMatch[1]
-      const linkUrl = markdownMatch[2]
-
-      // Add text before the link
+    if (linkMatch) {
+      const beforeLink = remaining.substring(0, linkMatch.index)
       if (beforeLink) {
         parts.push(...parseTextWithBreaks(beforeLink, key))
         key += 100
       }
 
-      // Add the link
       parts.push(
         <a
           key={`link-${key++}`}
-          href={linkUrl}
+          href={linkMatch.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-red hover:text-red-dark underline transition-colors"
+          className={LINK_CLASS}
         >
-          {linkText}
+          {linkMatch.text}
         </a>
       )
 
-      // Continue with the rest
-      remaining = remaining.substring((markdownMatch.index ?? 0) + markdownMatch[0].length)
-      continue
-    }
-
-    // Try to match plain URL
-    const urlMatch = remaining.match(/(https?:\/\/[^\s<]+)/)
-
-    if (urlMatch) {
-      const beforeLink = remaining.substring(0, urlMatch.index)
-      const url = urlMatch[1]
-
-      // Add text before the link
-      if (beforeLink) {
-        parts.push(...parseTextWithBreaks(beforeLink, key))
-        key += 100
-      }
-
-      // Add the link (use the URL as both href and text)
-      parts.push(
-        <a
-          key={`link-${key++}`}
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-red hover:text-red-dark underline transition-colors"
-        >
-          {url}
-        </a>
-      )
-
-      // Continue with the rest
-      remaining = remaining.substring((urlMatch.index ?? 0) + urlMatch[0].length)
+      remaining = remaining.substring(linkMatch.index + linkMatch.raw.length)
       continue
     }
 
@@ -120,25 +57,23 @@ export function parseDescriptionWithLinks(description: string): React.ReactNode[
   return parts
 }
 
+export { extractFirstDescriptionLink }
+
 /**
  * Helper function to parse text containing <br> or <br/> tags
  * and convert them to line breaks in React
  */
 function parseTextWithBreaks(text: string, startKey: number): React.ReactNode[] {
   const parts: React.ReactNode[] = []
-  const segments = text.split(/<br\s*\/?>/i)
+  const cleanText = text
+    .replace(/<br\s*\/?>/gi, '<br>')
+    .replace(/<\/(p|div|li)>/gi, '<br>')
+    .replace(/<[^>]*>/g, '')
+  const segments = cleanText.split(/<br>/i)
 
   segments.forEach((segment, index) => {
     if (segment) {
-      // Decode HTML entities
-      const decoded = segment
-        .replace(/&amp;/g, '&')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, "'")
-
-      parts.push(<span key={`text-${startKey}-${index}`}>{decoded}</span>)
+      parts.push(<span key={`text-${startKey}-${index}`}>{decodeHtmlEntities(segment)}</span>)
     }
 
     // Add line break after each segment except the last

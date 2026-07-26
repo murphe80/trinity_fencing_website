@@ -2,6 +2,7 @@ import { google } from 'googleapis'
 import type { CalendarEvent, EventTag } from '@/types'
 import { CALENDAR_COLOR_TAG_MAP, GOOGLE_CONFIG } from './constants'
 import { getGoogleAuthClient } from './google-auth'
+import { extractFirstDescriptionLink } from './description-links'
 
 function parseTagFromEvent(colorId?: string, description?: string): EventTag {
   if (colorId && CALENDAR_COLOR_TAG_MAP[colorId]) {
@@ -16,13 +17,13 @@ function parseTagFromEvent(colorId?: string, description?: string): EventTag {
   return 'General'
 }
 
-function extractLink(event: { hangoutLink?: string | null; description?: string | null }): string | undefined {
+function extractLink(event: {
+  hangoutLink?: string | null
+  description?: string | null
+  htmlLink?: string | null
+}): string | undefined {
   if (event.hangoutLink) return event.hangoutLink
-  if (event.description) {
-    const match = event.description.match(/https?:\/\/[^\s]+/)
-    if (match) return match[0]
-  }
-  return undefined
+  return extractFirstDescriptionLink(event.description) ?? event.htmlLink ?? undefined
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

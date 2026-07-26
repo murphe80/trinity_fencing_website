@@ -54,6 +54,7 @@ const PINKS_RECIPIENTS: { name: string; year: number; note?: string }[] = [
   { name: 'William Silvain Michael Mac Donald Hughes', year: 2024 },
   { name: 'Liam John Davidson Zone', year: 2025 },
   { name: 'Katie Lynch', year: 2025 },
+  { name: 'Eoghan O hAnluain Fay', year: 2026 },
 ]
 
 export default async function AchievementsPage() {

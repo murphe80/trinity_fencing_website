@@ -2,7 +2,7 @@
 
 This guide is for developers setting up the Google API credentials from scratch.
 
-> **Note on authentication:** This project uses **Google OAuth** credentials rather than a Service Account. Emma has an existing Google Cloud project with OAuth credentials configured.
+> **Authentication choice:** Use a **Google Service Account** for the website. The site only needs server-side, read-only access to club-owned Calendar, Sheets, and Drive content, so a service account avoids user OAuth refresh tokens expiring.
 
 ---
 
@@ -10,6 +10,7 @@ This guide is for developers setting up the Google API credentials from scratch.
 
 - Access to the Google Cloud Console for the existing project
 - Access to dufencing@gmail.com
+- Permission to create a service account in the Google Cloud project
 
 ---
 
@@ -25,35 +26,47 @@ In [Google Cloud Console](https://console.cloud.google.com):
 
 ---
 
-## Step 2 — Get OAuth Credentials
-
-The project uses OAuth 2.0 with a refresh token (offline access) so the server can make API calls without user interaction.
+## Step 2 — Create a Service Account
 
 1. Go to **APIs & Services → Credentials**
-2. Find or create an **OAuth 2.0 Client ID** (type: Web application or Desktop)
-3. Note the **Client ID** and **Client Secret**
+2. Click **Create Credentials → Service account**
+3. Give it a clear name, for example `dufc-website`
+4. After it is created, open the service account and go to **Keys**
+5. Click **Add key → Create new key → JSON**
+6. Download the JSON file and keep it private
+7. Copy the service account email. It looks like:
+   ```text
+   dufc-website@your-project-id.iam.gserviceaccount.com
+   ```
 
-### Getting a Refresh Token
-
-To get a refresh token for dufencing@gmail.com:
-
-1. Use the [OAuth 2.0 Playground](https://developers.google.com/oauthplayground/) or a local script
-2. Authorise these scopes:
-   - `https://www.googleapis.com/auth/calendar.readonly`
-   - `https://www.googleapis.com/auth/spreadsheets.readonly`
-   - `https://www.googleapis.com/auth/drive.readonly`
-3. Exchange the authorisation code for tokens
-4. Save the **refresh token** — this does not expire unless access is revoked
+Do not commit this JSON file to Git.
 
 ---
 
-## Step 3 — Share Resources with the OAuth Account
+## Step 3 — Share Google Resources with the Service Account
 
-Since the OAuth credentials are for dufencing@gmail.com itself, the account already has access to its own Calendar and Drive. For the Google Sheet:
+The service account is a separate identity. It cannot read dufencing@gmail.com content until each resource is shared with its service account email.
+
+### Calendar
+
+1. Open Google Calendar as `dufencing@gmail.com`
+2. Go to **Settings → Settings for my calendars → dufencing@gmail.com**
+3. Under **Share with specific people or groups**, add the service account email
+4. Give it **See all event details** access
+
+### Google Sheet
 
 1. Open the DUFC Google Sheet
 2. Click **Share**
-3. Ensure dufencing@gmail.com has at least **Viewer** access
+3. Add the service account email with **Viewer** access
+
+### Drive folders and images
+
+For any private Drive folders or images used by the site:
+
+1. Open the folder or file in Drive
+2. Click **Share**
+3. Add the service account email with **Viewer** access
 
 ---
 
@@ -62,9 +75,7 @@ Since the OAuth credentials are for dufencing@gmail.com itself, the account alre
 Copy `.env.local.example` to `.env.local` and fill in:
 
 ```bash
-GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your-client-secret
-GOOGLE_REFRESH_TOKEN=your-refresh-token
+GOOGLE_SERVICE_ACCOUNT_JSON='{"type":"service_account","project_id":"...","private_key_id":"...","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n","client_email":"dufc-website@your-project-id.iam.gserviceaccount.com",...}'
 GOOGLE_SHEETS_ID=the-spreadsheet-id-from-the-sheet-url
 GOOGLE_CALENDAR_ID=dufencing@gmail.com
 DRIVE_GALLERY_FOLDER_ID=folder-id-from-drive-url
@@ -74,6 +85,8 @@ DRIVE_INSTAGRAM_FOLDER_ID=folder-id-from-drive-url
 **Finding IDs:**
 - Sheet ID: from the URL `docs.google.com/spreadsheets/d/**SHEET_ID**/edit`
 - Drive folder ID: from the URL `drive.google.com/drive/folders/**FOLDER_ID**`
+
+The old OAuth variables (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`) still work as a fallback, but they are no longer the recommended production setup.
 
 ---
 
@@ -123,15 +136,15 @@ function triggerDeploy() {
 
 In the Vercel dashboard → Project → Settings → Environment Variables, add all variables from your `.env.local` file. These are required for the production build to work.
 
+For `GOOGLE_SERVICE_ACCOUNT_JSON`, paste the full JSON as a single environment variable value. If Vercel preserves `\n` escapes in the private key, the app will normalise them at runtime.
+
 ---
 
 ## Implementing the Google API Calls
 
-The lib files in `/lib/` contain stub functions with `// TODO` comments marking where the real API calls should go. Once credentials are configured:
+The lib files in `/lib/` contain the Google API calls. Once credentials are configured:
 
-1. Implement `getGoogleAuthClient()` in `/lib/google-auth.ts` — done
-2. Replace mock data in `/lib/google-calendar.ts` with real Calendar API calls
-3. Replace mock data in `/lib/google-sheets.ts` with real Sheets API calls
-4. Implement `getDriveFolderImages()` in `/lib/google-drive.ts`
-
-Each function has the correct TypeScript signature and comments explaining the intended implementation. The mock data is structured identically to real data, so the UI will work unchanged once the API calls are swapped in.
+1. `getGoogleAuthClient()` in `/lib/google-auth.ts` reads `GOOGLE_SERVICE_ACCOUNT_JSON`
+2. `/lib/google-calendar.ts` reads events from Google Calendar
+3. `/lib/google-sheets.ts` reads committee, achievements, coach, honorary members, and featured Instagram rows
+4. `/lib/google-drive.ts` reads shared Drive image folders

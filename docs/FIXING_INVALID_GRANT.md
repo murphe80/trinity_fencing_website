@@ -7,11 +7,12 @@ You're seeing this error in build logs or when data isn't displaying:
 Failed to fetch ... invalid_grant
 ```
 
-This means your Google OAuth **refresh token has expired**.
+This means your Google OAuth **refresh token has expired or been revoked**.
 
 ## Why This Happens
 
 Google refresh tokens can expire due to:
+- OAuth consent screen is set to **Testing** for an external app
 - Token hasn't been used in 6+ months
 - OAuth consent screen configuration changed
 - Credentials were regenerated
@@ -19,7 +20,23 @@ Google refresh tokens can expire due to:
 
 ## How to Fix
 
-### Option 1: Use the Automated Script (Recommended)
+### Option 1: Switch to a Service Account (Recommended)
+
+This website only needs server-side read-only access to club Calendar, Sheets, and Drive data. A service account is the most stable setup because it does not rely on a user refresh token.
+
+1. Follow [GOOGLE_API_SETUP.md](./GOOGLE_API_SETUP.md) to create a service account
+2. Share the Google Calendar, Sheet, and Drive folders with the service account email
+3. In Vercel, replace the OAuth variables with:
+   ```bash
+   GOOGLE_SERVICE_ACCOUNT_JSON='{"type":"service_account",...}'
+   GOOGLE_SHEETS_ID=...
+   GOOGLE_CALENDAR_ID=dufencing@gmail.com
+   ```
+4. Redeploy the site
+
+You can leave the old OAuth variables in place during migration, but `GOOGLE_SERVICE_ACCOUNT_JSON` takes priority.
+
+### Option 2: Use the Automated OAuth Script
 
 1. **Run the token refresh script:**
    ```bash
@@ -39,7 +56,7 @@ Google refresh tokens can expire due to:
    - Optionally update your `.env.local` file
    - Show you what to add to Vercel
 
-### Option 2: Manual OAuth Playground Method
+### Option 3: Manual OAuth Playground Method
 
 1. **Go to [Google OAuth 2.0 Playground](https://developers.google.com/oauthplayground/)**
 
@@ -73,16 +90,16 @@ Google refresh tokens can expire due to:
    - Update `GOOGLE_REFRESH_TOKEN` with the new value
    - Redeploy
 
-### Option 3: Check OAuth Consent Screen
+### Option 4: Check OAuth Consent Screen
 
 If you're still getting `invalid_grant` after refreshing:
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
 2. Navigate to **APIs & Services → OAuth consent screen**
 3. Make sure:
-   - Publishing status is **"In Production"** or **"Testing"** with your email added
+   - Publishing status is **"In Production"** for long-lived OAuth refresh tokens
    - All required scopes are listed
-   - Test users include `dufencing@gmail.com` (if in Testing mode)
+   - Test users include `dufencing@gmail.com` if you are temporarily using Testing mode
 
 ## After Fixing
 
@@ -105,7 +122,8 @@ If you're still getting `invalid_grant` after refreshing:
 
 To prevent this from happening again:
 
-- **Keep the site active** - the token stays valid as long as it's being used regularly
+- **Use `GOOGLE_SERVICE_ACCOUNT_JSON` in production** - preferred for this site
+- **If staying on OAuth, publish the OAuth consent app to Production**
 - **Don't revoke access** at https://myaccount.google.com/permissions
 - **Monitor build logs** for `invalid_grant` warnings
 

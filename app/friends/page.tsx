@@ -39,33 +39,18 @@ export default function FriendsPage() {
               </p>
             </div>
 
-            {/* Mailchimp embed placeholder */}
             <div className="mailchimp-wrapper">
-              {/*
-                MAILCHIMP EMBED CODE GOES HERE
-                ───────────────────────────────
-                To add the newsletter signup form:
-                1. Log in to Mailchimp at mailchimp.com
-                2. Go to Audience → Signup Forms → Embedded Forms
-                3. Select "Unstyled" or "Classic"
-                4. Copy the embed HTML
-                5. Replace this comment block with the copied code
-
-                The .mailchimp-wrapper CSS in globals.css will style the form
-                to match the DUFC design system automatically.
-              */}
               <div className="bg-white rounded-lg border border-grey-light p-8 text-center">
                 <p className="font-body text-grey-mid text-sm">
-                  Newsletter signup form coming soon.
-                </p>
-                <p className="font-body text-xs text-grey-mid mt-2">
-                  (Mailchimp embed code to be added — see /docs/NEWSLETTER_SETUP.md)
+                  Join the DUFC alumni and friends mailing list.
                 </p>
                 <a
-                  href={`mailto:${SITE_CONFIG.email}?subject=Newsletter Signup`}
+                  href="http://eepurl.com/iUqzP2"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-block mt-4 text-sm text-red font-medium font-body hover:underline"
                 >
-                  Email us to be added to the list →
+                  Sign up for the newsletter →
                 </a>
               </div>
             </div>

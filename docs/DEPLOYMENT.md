@@ -28,9 +28,7 @@ Vercel will build and deploy the site. Every push to the `main` branch will trig
 
 1. In the Vercel dashboard, go to **Project → Settings → Environment Variables**
 2. Add each variable from your `.env.local` file:
-   - `GOOGLE_CLIENT_ID`
-   - `GOOGLE_CLIENT_SECRET`
-   - `GOOGLE_REFRESH_TOKEN`
+   - `GOOGLE_SERVICE_ACCOUNT_JSON`
    - `GOOGLE_SHEETS_ID`
    - `GOOGLE_CALENDAR_ID`
    - `DRIVE_GALLERY_FOLDER_ID`
@@ -77,7 +75,7 @@ npm run dev
 # → http://localhost:3000
 ```
 
-The dev server uses the mock data in `/lib/google-calendar.ts` and `/lib/google-sheets.ts` if credentials are not set. Real data will load once credentials are configured and the TODO API calls are implemented.
+The dev server reads real Google data once credentials are configured. If credentials are missing or invalid, the Google-backed pages will log the API error and render empty sections instead of live data.
 
 ---
 

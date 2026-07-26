@@ -386,7 +386,7 @@ Full-width dark section (`bg-black`). Centred text.
 
 Heading: `"New to Fencing?"` in `font-heading text-white text-4xl`
 
-Subtext: `"No experience needed. We welcome beginners of all ages. Join us at training and try it for yourself."` in `text-white/70`.
+Subtext: `"No experience needed, welcome fencers of all levels. Join us at training and try it for yourself."` in `text-white/70`.
 
 Button: **"Find Out How to Join"** → `/membership`
 

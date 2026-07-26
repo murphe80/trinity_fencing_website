@@ -135,7 +135,7 @@ export default async function MembersPage() {
                   <tr>
                     <th className="text-left px-5 py-3 text-grey-dark font-medium">Year</th>
                     <th className="text-left px-5 py-3 text-grey-dark font-medium">Club Captain</th>
-                    <th className="text-left px-5 py-3 text-grey-dark font-medium">Women&apos;s Captain</th>
+                    <th className="text-left px-5 py-3 text-grey-dark font-medium">Men&apos;s/Women&apos;s Captain</th>
                   </tr>
                 </thead>
                 <tbody>

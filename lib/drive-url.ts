@@ -1,8 +1,21 @@
 /** Pure URL transforms for Drive links — safe for client bundles (no googleapis). */
 
+function extractDriveFileId(driveUrl: string): string | undefined {
+  const filePathMatch = driveUrl.match(/\/d\/([a-zA-Z0-9_-]+)/)
+  if (filePathMatch) return filePathMatch[1]
+
+  try {
+    const url = new URL(driveUrl)
+    const id = url.searchParams.get('id')
+    return id ?? undefined
+  } catch {
+    return undefined
+  }
+}
+
 export function driveUrlToImageSrc(driveUrl: string): string {
-  const match = driveUrl.match(/\/d\/([a-zA-Z0-9_-]+)/)
-  if (match) return `https://drive.google.com/uc?export=view&id=${match[1]}`
+  const fileId = extractDriveFileId(driveUrl)
+  if (fileId) return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1600`
   return driveUrl
 }
 

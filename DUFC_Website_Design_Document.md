@@ -627,8 +627,8 @@ Colour-to-tag mapping:
 ```typescript
 const colorTagMap: Record<string, EventTag> = {
   '11': 'Competition', // Tomato
-  '9':  'Social',      // Blueberry
-  '2':  'Training',    // Sage
+  '9':  'Training',    // Blueberry
+  '2':  'Social',      // Sage
   '5':  'Alumni',      // Banana
 }
 ```

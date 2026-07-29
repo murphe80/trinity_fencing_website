@@ -1,6 +1,6 @@
 import { google } from 'googleapis'
 import type { CalendarEvent, EventTag } from '@/types'
-import { CALENDAR_COLOR_TAG_MAP, GOOGLE_CONFIG } from './constants'
+import { GOOGLE_CONFIG } from './constants'
 import { getGoogleAuthClient } from './google-auth'
 import { extractFirstDescriptionLink } from './description-links'
 
@@ -13,7 +13,6 @@ type GoogleCalendarEvent = {
   end?: { dateTime?: string | null; date?: string | null } | null
   location?: string | null
   description?: string | null
-  colorId?: string | null
   eventLabelId?: string | null
   hangoutLink?: string | null
   htmlLink?: string | null
@@ -21,17 +20,12 @@ type GoogleCalendarEvent = {
 
 type GoogleCalendarLabel = {
   id?: string | null
-  backgroundColor?: string | null
   name?: string | null
 }
 
 const EVENT_LABEL_VERSION = 1
 
 const LABEL_NAME_TAG_MAP: Record<string, EventTag> = {
-  tomato: 'Competition',
-  blueberry: 'Training',
-  sage: 'Social',
-  banana: 'Alumni',
   competition: 'Competition',
   training: 'Training',
   social: 'Social',
@@ -39,36 +33,22 @@ const LABEL_NAME_TAG_MAP: Record<string, EventTag> = {
 }
 
 function parseTagFromEvent(
-  colorId?: string | null,
-  description?: string | null,
   eventLabelId?: string | null,
   eventLabelTagMap: Record<string, EventTag> = {}
 ): EventTag {
   if (eventLabelId && eventLabelTagMap[eventLabelId]) {
     return eventLabelTagMap[eventLabelId]
   }
-  if (colorId && CALENDAR_COLOR_TAG_MAP[colorId]) {
-    return CALENDAR_COLOR_TAG_MAP[colorId] as EventTag
-  }
-  const tagMatch = description?.match(/^Tag:\s*(\w+)/m)
-  if (tagMatch) {
-    const tag = tagMatch[1] as EventTag
-    const validTags: EventTag[] = ['Competition', 'Training', 'Social', 'Alumni', 'General']
-    if (validTags.includes(tag)) return tag
-  }
   return 'General'
 }
 
-function normalizeHexColor(color: string | null | undefined): string | undefined {
-  return color?.trim().toLowerCase()
+function normalizeLabelName(name: string | null | undefined): string | undefined {
+  return name?.trim().toLowerCase()
 }
 
 async function getEventLabelTagMap(calendar: GoogleCalendarClient): Promise<Record<string, EventTag>> {
   try {
-    const [calendarRes, colorsRes] = await Promise.all([
-      calendar.calendars.get({ calendarId: GOOGLE_CONFIG.calendarId }),
-      calendar.colors.get(),
-    ])
+    const calendarRes = await calendar.calendars.get({ calendarId: GOOGLE_CONFIG.calendarId })
 
     const labels = (
       (calendarRes.data as {
@@ -76,24 +56,10 @@ async function getEventLabelTagMap(calendar: GoogleCalendarClient): Promise<Reco
       }).labelProperties?.eventLabels ?? []
     )
 
-    const colorTagMap = Object.entries(colorsRes.data.event ?? {}).reduce<Record<string, EventTag>>(
-      (acc, [colorId, color]) => {
-        const tag = CALENDAR_COLOR_TAG_MAP[colorId] as EventTag | undefined
-        const background = normalizeHexColor(color.background)
-        if (tag && background) acc[background] = tag
-        return acc
-      },
-      {}
-    )
-
     return labels.reduce<Record<string, EventTag>>((acc, label) => {
       if (!label.id) return acc
 
-      const tagByName = label.name ? LABEL_NAME_TAG_MAP[label.name.trim().toLowerCase()] : undefined
-      const tagByColor = colorTagMap[normalizeHexColor(label.backgroundColor) ?? '']
-      const tagByLegacyId = CALENDAR_COLOR_TAG_MAP[label.id] as EventTag | undefined
-      const tag = tagByName ?? tagByColor ?? tagByLegacyId
-
+      const tag = LABEL_NAME_TAG_MAP[normalizeLabelName(label.name) ?? '']
       if (tag) acc[label.id] = tag
       return acc
     }, {})
@@ -131,7 +97,7 @@ function mapGoogleEvent(
     allDay: !event.start?.dateTime,
     location: event.location ?? undefined,
     description: event.description ?? undefined,
-    tag: parseTagFromEvent(event.colorId, event.description, event.eventLabelId, eventLabelTagMap),
+    tag: parseTagFromEvent(event.eventLabelId, eventLabelTagMap),
     link: extractLink(event),
   }
 }

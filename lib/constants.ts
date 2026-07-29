@@ -20,10 +20,3 @@ export const GOOGLE_CONFIG = {
   galleryFolderId: process.env.DRIVE_GALLERY_FOLDER_ID ?? '',
   instagramFolderId: process.env.DRIVE_INSTAGRAM_FOLDER_ID ?? '',
 }
-
-export const CALENDAR_COLOR_TAG_MAP: Record<string, string> = {
-  '11': 'Competition', // Tomato
-  '9': 'Training',    // Blueberry
-  '2': 'Social',      // Sage
-  '5': 'Alumni',      // Banana
-}

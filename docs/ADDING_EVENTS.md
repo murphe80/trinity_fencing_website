@@ -23,26 +23,26 @@ The website automatically reads events from the **dufencing@gmail.com Google Cal
      - You can also use plain URLs: `https://example.com`
      - Links will be automatically clickable on the website
      - Line breaks are supported and will display correctly
-4. **Set the event colour** to indicate the type (see colour guide below)
+4. **Set the event label** to indicate the type (see label guide below)
 5. Click **Save**
 
 The website will update automatically within 30 minutes. For an immediate update, see the section below.
 
 ---
 
-## Event Colour Guide
+## Event Label Guide
 
-The colour you choose determines the tag shown on the website:
+The label you choose determines the tag shown on the website:
 
-| Calendar Colour | Tag Shown | Use For |
+| Calendar Label | Tag Shown | Use For |
 |---|---|---|
-| 🍅 Tomato (red) | **Competition** | Intervarsities, national competitions, tournaments |
-| 🫐 Blueberry (dark blue) | **Training** | Regular weekly training sessions |
-| 🌿 Sage (green) | **Social** | Club socials, non-competitive events |
-| 🍌 Banana (yellow) | **Alumni** | Alumni days, reunion events |
-| *(any other colour)* | General | Miscellaneous |
+| `competition` | **Competition** | Intervarsities, national competitions, tournaments |
+| `training` | **Training** | Regular weekly training sessions |
+| `social` | **Social** | Club socials, non-competitive events |
+| `alumni` | **Alumni** | Alumni days, reunion events |
+| *(no matching label)* | General | Miscellaneous |
 
-To set the colour: when editing an event, click the coloured circle next to the event title in the editing form.
+To set the label: when editing an event, choose the matching event label. The label names should be lowercase exactly as shown above. The label colours in Google Calendar can still match the old colour guide, but the website reads the label name, not the colour.
 
 ---
 
@@ -69,4 +69,4 @@ If you need the website to update right away (e.g. before a competition):
 ## Troubleshooting
 
 - **The event isn't showing up** — Check that the event is in the future and that the dufencing@gmail.com calendar is the one shown (not a personal calendar). Wait 30 minutes for the automatic refresh.
-- **The tag shows "General" instead of "Competition"** — Make sure you set the event colour to Tomato (red). If the colour is set correctly but the tag is wrong, you can also add `Tag: Competition` on its own line in the event description.
+- **The tag shows "General" instead of "Competition"** — Make sure the event has the `competition` label, and that the label name is spelled exactly as shown in the guide.

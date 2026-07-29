@@ -14,6 +14,7 @@ type GoogleCalendarEvent = {
   location?: string | null
   description?: string | null
   eventLabelId?: string | null
+  colorId?: string | null
   hangoutLink?: string | null
   htmlLink?: string | null
 }
@@ -24,6 +25,7 @@ type GoogleCalendarLabel = {
 }
 
 const EVENT_LABEL_VERSION = 1
+const CALENDAR_API_BASE_URL = 'https://www.googleapis.com/calendar/v3'
 
 const LABEL_NAME_TAG_MAP: Record<string, EventTag> = {
   competition: 'Competition',
@@ -32,18 +34,81 @@ const LABEL_NAME_TAG_MAP: Record<string, EventTag> = {
   alumni: 'Alumni',
 }
 
+const COLOR_TAG_MAP: Record<string, EventTag> = {
+  '11': 'Competition',
+  '9': 'Training',
+  '2': 'Social',
+  '5': 'Alumni',
+}
+
+type CalendarEventsResponse = {
+  items?: GoogleCalendarEvent[]
+}
+
 function parseTagFromEvent(
   eventLabelId?: string | null,
-  eventLabelTagMap: Record<string, EventTag> = {}
+  eventLabelTagMap: Record<string, EventTag> = {},
+  colorId?: string | null,
+  description?: string | null
 ): EventTag {
   if (eventLabelId && eventLabelTagMap[eventLabelId]) {
     return eventLabelTagMap[eventLabelId]
   }
+
+  const labelNameTag = LABEL_NAME_TAG_MAP[normalizeLabelName(eventLabelId) ?? '']
+  if (labelNameTag) return labelNameTag
+
+  if (colorId && COLOR_TAG_MAP[colorId]) {
+    return COLOR_TAG_MAP[colorId]
+  }
+
+  const descriptionTag = parseTagFromDescription(description)
+  if (descriptionTag) return descriptionTag
+
   return 'General'
 }
 
 function normalizeLabelName(name: string | null | undefined): string | undefined {
   return name?.trim().toLowerCase()
+}
+
+function parseTagFromDescription(description: string | null | undefined): EventTag | undefined {
+  const tagLine = description
+    ?.replace(/<br\s*\/?>/gi, '\n')
+    .split('\n')
+    .find(line => /^\s*tag\s*:/i.test(line))
+
+  const tagName = tagLine?.replace(/^\s*tag\s*:\s*/i, '')
+  return LABEL_NAME_TAG_MAP[normalizeLabelName(tagName) ?? '']
+}
+
+async function requestCalendarData<T>(
+  path: string,
+  params?: Record<string, string | number | boolean | undefined>
+): Promise<T> {
+  const auth = getGoogleAuthClient()
+  const res = await auth.request<T>({
+    url: `${CALENDAR_API_BASE_URL}${path}`,
+    method: 'GET',
+    params,
+  })
+
+  return res.data
+}
+
+async function listCalendarEvents(
+  params: Record<string, string | number | boolean | undefined>
+): Promise<GoogleCalendarEvent[]> {
+  const calendarId = encodeURIComponent(GOOGLE_CONFIG.calendarId)
+  const data = await requestCalendarData<CalendarEventsResponse>(
+    `/calendars/${calendarId}/events`,
+    {
+      ...params,
+      eventLabelVersion: EVENT_LABEL_VERSION,
+    }
+  )
+
+  return data.items ?? []
 }
 
 async function getEventLabelTagMap(calendar: GoogleCalendarClient): Promise<Record<string, EventTag>> {
@@ -97,17 +162,13 @@ function mapGoogleEvent(
     allDay: !event.start?.dateTime,
     location: event.location ?? undefined,
     description: event.description ?? undefined,
-    tag: parseTagFromEvent(event.eventLabelId, eventLabelTagMap),
+    tag: parseTagFromEvent(
+      event.eventLabelId,
+      eventLabelTagMap,
+      event.colorId,
+      event.description
+    ),
     link: extractLink(event),
-  }
-}
-
-function withEventLabelVersion<T extends Record<string, unknown>>(params: T): T & {
-  eventLabelVersion: number
-} {
-  return {
-    ...params,
-    eventLabelVersion: EVENT_LABEL_VERSION,
   }
 }
 
@@ -116,16 +177,13 @@ export async function getUpcomingEvents(maxResults = 50): Promise<CalendarEvent[
     const auth = getGoogleAuthClient()
     const calendar = google.calendar({ version: 'v3', auth })
     const eventLabelTagMap = await getEventLabelTagMap(calendar)
-    const res = await calendar.events.list(withEventLabelVersion({
-      calendarId: GOOGLE_CONFIG.calendarId,
+    const events = await listCalendarEvents({
       timeMin: new Date().toISOString(),
       maxResults,
       singleEvents: true,
       orderBy: 'startTime',
-    }) as any)
-    return (res.data.items ?? []).map(event =>
-      mapGoogleEvent(event as GoogleCalendarEvent, eventLabelTagMap)
-    )
+    })
+    return events.map(event => mapGoogleEvent(event, eventLabelTagMap))
   } catch (err) {
     console.error('Failed to fetch upcoming calendar events:', err)
     return []
@@ -145,16 +203,13 @@ export async function getAllEvents(): Promise<CalendarEvent[]> {
       8, 1
     )
 
-    const res = await calendar.events.list(withEventLabelVersion({
-      calendarId: GOOGLE_CONFIG.calendarId,
+    const events = await listCalendarEvents({
       timeMin: academicYearStart.toISOString(),
       maxResults: 200,
       singleEvents: true,
       orderBy: 'startTime',
-    }) as any)
-    return (res.data.items ?? []).map(event =>
-      mapGoogleEvent(event as GoogleCalendarEvent, eventLabelTagMap)
-    )
+    })
+    return events.map(event => mapGoogleEvent(event, eventLabelTagMap))
   } catch (err) {
     console.error('Failed to fetch all calendar events:', err)
     return []
@@ -166,15 +221,14 @@ export async function getPastEvents(maxResults = 20): Promise<CalendarEvent[]> {
     const auth = getGoogleAuthClient()
     const calendar = google.calendar({ version: 'v3', auth })
     const eventLabelTagMap = await getEventLabelTagMap(calendar)
-    const res = await calendar.events.list(withEventLabelVersion({
-      calendarId: GOOGLE_CONFIG.calendarId,
+    const events = await listCalendarEvents({
       timeMax: new Date().toISOString(),
       maxResults,
       singleEvents: true,
       orderBy: 'startTime',
-    }) as any)
-    return (res.data.items ?? [])
-      .map(event => mapGoogleEvent(event as GoogleCalendarEvent, eventLabelTagMap))
+    })
+    return events
+      .map(event => mapGoogleEvent(event, eventLabelTagMap))
       .sort((a, b) => b.start.getTime() - a.start.getTime())
   } catch (err) {
     console.error('Failed to fetch past calendar events:', err)

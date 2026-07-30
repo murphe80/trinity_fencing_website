@@ -18,7 +18,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://trinityfencing.ie'),
+  metadataBase: new URL('https://www.trinityfencing.ie'),
   title: {
     template: '%s | Dublin University Fencing Club',
     default: 'Dublin University Fencing Club',
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Dublin University Fencing Club',
     description: "Ireland's oldest university fencing club. Founded 1774.",
-    url: 'https://trinityfencing.ie',
+    url: 'https://www.trinityfencing.ie',
     siteName: 'DUFC',
     images: [{ url: '/images/og-image.jpg', width: 1200, height: 630 }],
     locale: 'en_IE',

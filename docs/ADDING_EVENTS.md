@@ -23,7 +23,7 @@ The website automatically reads events from the **dufencing@gmail.com Google Cal
      - You can also use plain URLs: `https://example.com`
      - Links will be automatically clickable on the website
      - Line breaks are supported and will display correctly
-4. **Set the event label** to indicate the type (see label guide below)
+4. **Set the event label** to indicate the type, and use a clear type word in the title or description, e.g. `Training`, `Alumni`, `Social`, or `Intervarsities` (see guide below)
 5. Click **Save**
 
 The website will update automatically within 30 minutes. For an immediate update, see the section below.
@@ -32,7 +32,12 @@ The website will update automatically within 30 minutes. For an immediate update
 
 ## Event Label Guide
 
-The label you choose determines the tag shown on the website:
+The website checks multiple fields to decide the tag shown on the website:
+
+1. Calendar event label, if Google exposes it to the website
+2. Calendar event colour, for older events that use the colour guide
+3. A description line like `Tag: Training`
+4. Type keywords in the title or description, such as `Training`, `Alumni`, `Social`, `Intervarsities`, or `Tournament`
 
 | Calendar Label | Tag Shown | Use For |
 |---|---|---|
@@ -42,7 +47,7 @@ The label you choose determines the tag shown on the website:
 | `alumni` | **Alumni** | Alumni days, reunion events |
 | *(no matching label)* | General | Miscellaneous |
 
-To set the label: when editing an event, choose the matching event label. The label names should be lowercase exactly as shown above. The label colours in Google Calendar can still match the old colour guide, but the website reads the label name, not the colour.
+To set the label: when editing an event, choose the matching event label. The label names should be lowercase exactly as shown above. Because Google Calendar does not always expose labels or colours through the API, keep the event title or description explicit too, e.g. `Summer Training`, `Alumni Training Club`, or `Intervarsities`.
 
 ---
 
@@ -69,4 +74,4 @@ If you need the website to update right away (e.g. before a competition):
 ## Troubleshooting
 
 - **The event isn't showing up** — Check that the event is in the future and that the dufencing@gmail.com calendar is the one shown (not a personal calendar). Wait 30 minutes for the automatic refresh.
-- **The tag shows "General" instead of "Competition"** — Make sure the event has the `competition` label, and that the label name is spelled exactly as shown in the guide.
+- **The tag shows "General" instead of "Competition"** — Add `Tag: Competition` to the description, or use a clear competition keyword in the title, such as `Intervarsities`, `Tournament`, or `Championship`.

@@ -1,10 +1,7 @@
-import { google } from 'googleapis'
 import type { CalendarEvent, EventTag } from '@/types'
 import { GOOGLE_CONFIG } from './constants'
 import { getGoogleAuthClient } from './google-auth'
 import { extractFirstDescriptionLink } from './description-links'
-
-type GoogleCalendarClient = ReturnType<typeof google.calendar>
 
 type GoogleCalendarEvent = {
   id?: string | null
@@ -22,6 +19,10 @@ type GoogleCalendarEvent = {
 type GoogleCalendarLabel = {
   id?: string | null
   name?: string | null
+}
+
+type GoogleCalendarMetadata = {
+  labelProperties?: { eventLabels?: GoogleCalendarLabel[] }
 }
 
 const EVENT_LABEL_VERSION = 1
@@ -49,7 +50,8 @@ function parseTagFromEvent(
   eventLabelId?: string | null,
   eventLabelTagMap: Record<string, EventTag> = {},
   colorId?: string | null,
-  description?: string | null
+  description?: string | null,
+  summary?: string | null
 ): EventTag {
   if (eventLabelId && eventLabelTagMap[eventLabelId]) {
     return eventLabelTagMap[eventLabelId]
@@ -64,6 +66,9 @@ function parseTagFromEvent(
 
   const descriptionTag = parseTagFromDescription(description)
   if (descriptionTag) return descriptionTag
+
+  const textTag = parseTagFromText(summary, description)
+  if (textTag) return textTag
 
   return 'General'
 }
@@ -80,6 +85,39 @@ function parseTagFromDescription(description: string | null | undefined): EventT
 
   const tagName = tagLine?.replace(/^\s*tag\s*:\s*/i, '')
   return LABEL_NAME_TAG_MAP[normalizeLabelName(tagName) ?? '']
+}
+
+function normalizeSearchText(...parts: Array<string | null | undefined>): string {
+  return parts
+    .filter(Boolean)
+    .join(' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;|&#160;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase()
+}
+
+function parseTagFromText(
+  summary: string | null | undefined,
+  description: string | null | undefined
+): EventTag | undefined {
+  const text = normalizeSearchText(summary, description)
+  if (!text) return undefined
+
+  if (/\balumni\b/.test(text)) return 'Alumni'
+  if (/\b(social|pub|drinks|dinner|ball|quiz|party|bbq|barbecue)\b/.test(text)) {
+    return 'Social'
+  }
+  if (/\b(intervarsit(?:y|ies)|competition|tournament|championship|championships)\b/.test(text)) {
+    return 'Competition'
+  }
+  if (/\b(training|train|footwork|free fencing|s&c|strength and conditioning|beginner|beginners|taster)\b/.test(text)) {
+    return 'Training'
+  }
+
+  return undefined
 }
 
 async function requestCalendarData<T>(
@@ -111,15 +149,14 @@ async function listCalendarEvents(
   return data.items ?? []
 }
 
-async function getEventLabelTagMap(calendar: GoogleCalendarClient): Promise<Record<string, EventTag>> {
+async function getEventLabelTagMap(): Promise<Record<string, EventTag>> {
   try {
-    const calendarRes = await calendar.calendars.get({ calendarId: GOOGLE_CONFIG.calendarId })
-
-    const labels = (
-      (calendarRes.data as {
-        labelProperties?: { eventLabels?: GoogleCalendarLabel[] }
-      }).labelProperties?.eventLabels ?? []
+    const calendarId = encodeURIComponent(GOOGLE_CONFIG.calendarId)
+    const calendar = await requestCalendarData<GoogleCalendarMetadata>(
+      `/calendars/${calendarId}`,
+      { eventLabelVersion: EVENT_LABEL_VERSION }
     )
+    const labels = calendar.labelProperties?.eventLabels ?? []
 
     return labels.reduce<Record<string, EventTag>>((acc, label) => {
       if (!label.id) return acc
@@ -166,7 +203,8 @@ function mapGoogleEvent(
       event.eventLabelId,
       eventLabelTagMap,
       event.colorId,
-      event.description
+      event.description,
+      event.summary
     ),
     link: extractLink(event),
   }
@@ -174,9 +212,7 @@ function mapGoogleEvent(
 
 export async function getUpcomingEvents(maxResults = 50): Promise<CalendarEvent[]> {
   try {
-    const auth = getGoogleAuthClient()
-    const calendar = google.calendar({ version: 'v3', auth })
-    const eventLabelTagMap = await getEventLabelTagMap(calendar)
+    const eventLabelTagMap = await getEventLabelTagMap()
     const events = await listCalendarEvents({
       timeMin: new Date().toISOString(),
       maxResults,
@@ -192,9 +228,7 @@ export async function getUpcomingEvents(maxResults = 50): Promise<CalendarEvent[
 
 export async function getAllEvents(): Promise<CalendarEvent[]> {
   try {
-    const auth = getGoogleAuthClient()
-    const calendar = google.calendar({ version: 'v3', auth })
-    const eventLabelTagMap = await getEventLabelTagMap(calendar)
+    const eventLabelTagMap = await getEventLabelTagMap()
 
     // Fetch from the start of the current academic year (Sept 1)
     const now = new Date()
@@ -218,9 +252,7 @@ export async function getAllEvents(): Promise<CalendarEvent[]> {
 
 export async function getPastEvents(maxResults = 20): Promise<CalendarEvent[]> {
   try {
-    const auth = getGoogleAuthClient()
-    const calendar = google.calendar({ version: 'v3', auth })
-    const eventLabelTagMap = await getEventLabelTagMap(calendar)
+    const eventLabelTagMap = await getEventLabelTagMap()
     const events = await listCalendarEvents({
       timeMax: new Date().toISOString(),
       maxResults,

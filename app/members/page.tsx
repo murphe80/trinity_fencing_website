@@ -2,13 +2,13 @@ import type { Metadata } from 'next'
 import PageHeroWatermark from '@/components/layout/PageHeroWatermark'
 import PersonCard from '@/components/members/PersonCard'
 import CoachCard from '@/components/members/CoachCard'
-import { getCommitteeMembers, getCoach, getHonoraryMembers } from '@/lib/google-sheets'
+import { getCommitteeMembers, getCoaches, getHonoraryMembers } from '@/lib/google-sheets'
 
 export const revalidate = 21600
 
 export const metadata: Metadata = {
   title: 'The Club',
-  description: 'Meet the DUFC committee, coach, and honorary members.',
+  description: 'Meet the DUFC committee, coaches, and honorary members.',
 }
 
 const ALUMNI_CAPTAINS = [
@@ -42,9 +42,9 @@ const ALUMNI_CAPTAINS = [
 ]
 
 export default async function MembersPage() {
-  const [committee, coach, honorary] = await Promise.all([
+  const [committee, coaches, honorary] = await Promise.all([
     getCommitteeMembers(),
-    getCoach(),
+    getCoaches(),
     getHonoraryMembers(),
   ])
 
@@ -66,10 +66,14 @@ export default async function MembersPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-20">
 
         {/* Coach */}
-        {coach && (
+        {coaches.length > 0 && (
           <section>
             <h2 className="font-heading text-3xl font-semibold text-black mb-6">Coaching</h2>
-            <CoachCard coach={coach} />
+            <div className="space-y-6">
+              {coaches.map(coach => (
+                <CoachCard key={coach.name} coach={coach} />
+              ))}
+            </div>
           </section>
         )}
 

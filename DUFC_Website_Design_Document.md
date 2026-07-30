@@ -786,7 +786,7 @@ All content is managed through a single Google Spreadsheet shared with the servi
 | D: `photo_url` | Text | Google Drive shareable URL |
 | E: `qualifications` | Text | e.g. `FIE Level 3 Coach` |
 
-Only one active coach row is expected, but the schema supports multiple.
+Each populated coach row is displayed on the members page.
 
 ### 9.4 Tab: `Honorary Members`
 

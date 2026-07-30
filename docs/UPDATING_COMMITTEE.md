@@ -77,4 +77,4 @@ Coach details are in the **Coach** tab of the same Google Sheet. The columns are
 | D — photo_url | Google Drive link to a headshot |
 | E — qualifications | e.g. `FIE Level 3 Coach` |
 
-If the coach changes, update the existing row (or add a new row and remove the old one).
+Each populated row is displayed on the website. To add another coach, add a new row in this tab.

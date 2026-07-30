@@ -70,22 +70,27 @@ export async function getCommitteeMembers(): Promise<CommitteeMember[]> {
   }
 }
 
-export async function getCoach(): Promise<Coach | null> {
+export async function getCoaches(): Promise<Coach[]> {
   try {
     const rows = await getSheetValues('Coach!A:E')
-    const row = rows[0]
-    if (!row || !row[0]) return null
-    return {
-      name: row[0] ?? '',
-      title: row[1] ?? '',
-      bio: row[2] ?? '',
-      photoUrl: safeDriveImageUrl(row[3]),
-      qualifications: row[4] || undefined,
-    }
+    return rows
+      .map(row => ({
+        name: row[0] ?? '',
+        title: row[1] ?? '',
+        bio: row[2] ?? '',
+        photoUrl: safeDriveImageUrl(row[3]),
+        qualifications: row[4] || undefined,
+      }))
+      .filter(coach => coach.name)
   } catch (err) {
-    console.error('Failed to fetch coach:', err)
-    return null
+    console.error('Failed to fetch coaches:', err)
+    return []
   }
+}
+
+export async function getCoach(): Promise<Coach | null> {
+  const coaches = await getCoaches()
+  return coaches[0] ?? null
 }
 
 export async function getHonoraryMembers(): Promise<HonoraryMember[]> {

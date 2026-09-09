@@ -437,7 +437,7 @@ export default function PouleTracker() {
                     Count towards The Wheel Tournament
                   </label>
                   <p className="text-sm text-grey-dark mt-5">
-                    Save using a Google account with permission to edit the club's poule results folder. To request access, please contact murphe80@tcd.ie
+                    Save using a Google account with permission to edit the club&apos;s poule results folder. To request access, please contact murphe80@tcd.ie
                   </p>
                   {connected && (
                     <button

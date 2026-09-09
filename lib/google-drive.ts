@@ -1,8 +1,11 @@
+import { googleErrorSummary } from '@/lib/google-error'
 import { google } from 'googleapis'
 import type { DriveImage } from '@/types'
 import { getGoogleAuthClient } from './google-auth'
 
-export async function getDriveFolderImages(folderId: string): Promise<DriveImage[]> {
+export async function getDriveFolderImages(
+  folderId: string,
+): Promise<DriveImage[]> {
   try {
     const auth = getGoogleAuthClient()
     const drive = google.drive({ version: 'v3', auth })
@@ -12,14 +15,19 @@ export async function getDriveFolderImages(folderId: string): Promise<DriveImage
       orderBy: 'name',
       pageSize: 100,
     })
-    return (res.data.files ?? []).map(file => ({
+    return (res.data.files ?? []).map((file) => ({
       id: file.id ?? '',
       name: file.name ?? '',
       src: `https://drive.google.com/uc?export=view&id=${file.id}`,
-      thumbnailSrc: file.thumbnailLink ?? `https://drive.google.com/thumbnail?id=${file.id}&sz=w400`,
+      thumbnailSrc:
+        file.thumbnailLink ??
+        `https://drive.google.com/thumbnail?id=${file.id}&sz=w400`,
     }))
   } catch (err) {
-    console.error('Failed to fetch Drive folder images:', err)
+    console.error(
+      'Failed to fetch Drive folder images:',
+      googleErrorSummary(err),
+    )
     return []
   }
 }

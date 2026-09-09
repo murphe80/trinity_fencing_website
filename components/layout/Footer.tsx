@@ -120,6 +120,10 @@ export default function Footer() {
           <p className="font-body text-xs text-white/40">
             © {year} Dublin University Fencing Club. All rights reserved.
           </p>
+          <nav aria-label="Legal" className="flex flex-wrap justify-center gap-x-5 gap-y-2 font-body text-xs text-white/70">
+            <Link href="/privacy-policy" className="hover:text-white underline underline-offset-4">Privacy Policy</Link>
+            <Link href="/terms-of-service" className="hover:text-white underline underline-offset-4">Terms of Service</Link>
+          </nav>
           <a
             href={SITE_CONFIG.wikipediaUrl}
             target="_blank"

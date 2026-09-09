@@ -36,3 +36,6 @@ next-env.d.ts
 # Google service account keys — never commit these
 *service-account*.json
 *credentials*.json
+
+# Downloaded Google OAuth client credentials
+client_secret_*.json

@@ -23,13 +23,14 @@ export default function HeroSection() {
         style={{ clipPath: 'polygon(0 100%, 100% 100%, 100% 0)' }}
       />
 
-      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+      <div className="relative text-center px-4 max-w-4xl mx-auto">
         <Image
-          src="/images/crest_white.png"
-          alt="DUFC crest"
-          width={120}
-          height={120}
+          src="/images/crest_with_swords.png"
+          alt="DUFC circular crest with crossed fencing swords"
+          width={150}
+          height={150}
           className="mx-auto mb-8 opacity-90"
+          style={{ maskImage: "url(/images/crest_with_swords.png)", maskMode: "luminance", maskSize: "100% 100%" }}
           priority
         />
 

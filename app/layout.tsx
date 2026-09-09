@@ -18,6 +18,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  icons: { icon: '/images/crest_white.png', apple: '/images/crest_white.png' },
   metadataBase: new URL('https://www.trinityfencing.ie'),
   title: {
     template: '%s | Dublin University Fencing Club',

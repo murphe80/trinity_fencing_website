@@ -14,7 +14,7 @@ const FAQ_ITEMS = [
     question: 'What equipment do I need to start?',
     answer: (
       <span>
-        Nothing! The club has a range of equipment available for club members to use.
+        Nothing! The club has a range of equipment available for club members to use. All we ask is that you wear athletic clothing and suitable footwear for exercise.
       </span>
     ),
   },
@@ -32,8 +32,8 @@ const FAQ_ITEMS = [
     answer: `Absolutely. Experienced fencers are very welcome. Get in touch via ${SITE_CONFIG.email} to discuss.`,
   },
   {
-    question: 'Is there a trial session?',
-    answer: 'No, for insurance reasons we do not allow trial sessions.',
+    question: 'Is there a try-out session?',
+    answer: 'Yes, if you have experience fencing we have a try-out session in September. For more information, please contact us.',
   },
   {
     question: 'What are the membership fees?',
@@ -51,7 +51,7 @@ const FAQ_ITEMS = [
 const WHAT_TO_EXPECT = [
   {
     title: 'Beginners Welcome',
-    body: 'No prior experience is needed. We provide beginner coaching and can lend equipment.',
+    body: 'No prior experience is needed. We provide beginner coaching and lend equipment.',
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />

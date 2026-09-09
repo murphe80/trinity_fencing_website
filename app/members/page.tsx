@@ -91,34 +91,7 @@ export default async function MembersPage() {
           </section>
         )}
 
-        {/* Honorary Members */}
-        {honorary.length > 0 && (
-          <section>
-            <h2 className="font-heading text-3xl font-semibold text-black mb-4">
-              Honorary Members
-            </h2>
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <table className="w-full text-sm font-body">
-                <thead className="bg-grey-light">
-                  <tr>
-                    <th className="text-left px-5 py-3 text-grey-dark font-medium">Name</th>
-                    <th className="text-left px-5 py-3 text-grey-dark font-medium">Year Awarded</th>
-                    <th className="text-left px-5 py-3 text-grey-dark font-medium hidden sm:table-cell">Note</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {honorary.map((m, i) => (
-                    <tr key={m.name} className={i % 2 === 0 ? 'bg-white' : 'bg-grey-light/50'}>
-                      <td className="px-5 py-3 font-medium text-black">{m.name}</td>
-                      <td className="px-5 py-3 text-grey-dark">{m.yearAwarded}</td>
-                      <td className="px-5 py-3 text-grey-mid hidden sm:table-cell">{m.note}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        )}
+
 
         {/* Alumni Captains */}
         <section>

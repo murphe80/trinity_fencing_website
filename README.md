@@ -77,3 +77,7 @@ To hand the repo to an AI agent: share this README, the design document, and the
 - **Google Drive API v3** — photos
 - **Mailchimp** — newsletter (embedded form on /friends)
 - **Vercel Analytics** — page views
+
+## Policies and club tournaments
+
+See [Club tournament setup](docs/CLUB_TOURNAMENTS.md) for the new pages, Google sign-in for direct Drive uploads, local testing, printing, and Saturday 10am Dublin publication on Render.

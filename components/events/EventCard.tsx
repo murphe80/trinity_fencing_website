@@ -41,7 +41,7 @@ export default function EventCard({ event }: Props) {
 
         {event.description && (
           <p className="font-body text-sm text-grey-dark leading-relaxed line-clamp-2">
-            {parseDescriptionWithLinks(event.description)}
+            {parseDescriptionWithLinks(event.description, true)}
           </p>
         )}
 
@@ -52,7 +52,7 @@ export default function EventCard({ event }: Props) {
             rel="noopener noreferrer"
             className="inline-block mt-2 font-body text-sm text-red font-medium hover:text-red-dark transition-colors"
           >
-            Details →
+            See on calendar →
           </a>
         )}
       </div>

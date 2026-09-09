@@ -1,0 +1,15 @@
+# Add this cron service to your Render Blueprint or create it using the guide.
+# Does not alter the existing website service.
+services:
+  - type: cron
+    name: dufc-wheel-publication
+    runtime: node
+    repo: https://github.com/murphe80/trinity_fencing_website
+    schedule: "0 9,10 * * 6"
+    buildCommand: "node --version"
+    startCommand: "node scripts/refresh-wheel.mjs"
+    envVars:
+      - key: SITE_URL
+        sync: false
+      - key: CRON_SECRET
+        sync: false

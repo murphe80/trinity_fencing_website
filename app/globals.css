@@ -58,3 +58,65 @@
 .mailchimp-wrapper .mc-field-group {
   @apply mb-4;
 }
+
+@layer components {
+  .eyebrow { @apply text-xs uppercase tracking-[0.2em] font-semibold text-red; }
+  .club-card { @apply bg-white border border-black/10 rounded-xl p-5 sm:p-7; }
+  .club-input { @apply block w-full mt-2 border border-black/20 rounded-md bg-white px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-red; }
+  .club-button { @apply bg-red text-white rounded-full px-6 py-3 text-sm font-semibold hover:bg-red-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed; }
+  .club-secondary { @apply border border-black/20 rounded-full px-4 py-2 text-sm hover:border-red hover:text-red transition-colors; }
+  .club-notice { @apply border-l-4 border-red bg-red-light px-5 py-4 text-sm; }
+  .club-table { @apply w-full text-sm text-left; }
+  .club-table th, .club-table td { @apply py-3 px-2 border-b border-black/10; }
+  .club-table thead th { @apply text-xs text-grey-dark uppercase tracking-wide; }
+}
+:focus-visible { outline: 2px solid #C8102E; outline-offset: 4px; }
+@media print {
+  header, footer, button, input[type=password] { display: none !important; }
+  .club-card { break-inside: avoid; }
+  body { background: white; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+progress::-webkit-progress-bar { background: #F3F3F3; border-radius: 1rem; }
+progress::-webkit-progress-value { background: #C8102E; border-radius: 1rem; }
+progress::-moz-progress-bar { background: #C8102E; border-radius: 1rem; }
+
+.nav-dropdown-summary::-webkit-details-marker { display: none; }
+.featured-banner { display: flex; }
+.featured-window { flex: 1; }
+.featured-track { display: flex; width: max-content; animation: featured-conveyor 40s linear infinite; }
+.featured-group { display: flex; flex-shrink: 0; min-width: 100vw; justify-content: space-around; }
+.featured-item { display: flex; align-items: center; flex-shrink: 0; gap: 1.25rem; padding: 0 1.5rem; height: 3.5rem; white-space: nowrap; }
+.featured-divider { height: 1rem; width: 1px; flex-shrink: 0; background: rgb(255 255 255 / 35%); }
+.featured-banner[data-paused='true'] .featured-track,
+.featured-banner:hover .featured-track,
+.featured-banner:focus-within .featured-track { animation-play-state: paused; }
+@keyframes featured-conveyor { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .featured-track { animation: none !important; width: 100%; }
+  .featured-group { min-width: 0; width: 100%; }
+  .featured-group + .featured-group, .featured-item + .featured-item, .featured-pause { display: none; }
+  .featured-item { flex-shrink: 1; flex-wrap: wrap; justify-content: center; height: auto; min-height: 3.5rem; padding: 1rem 1.5rem; gap: .75rem; white-space: normal; text-align: center; }
+  .featured-divider { display: none; }
+}
+
+.poule-print-only { display: none; }
+@media print {
+  @page { size: A4 landscape; margin: 12mm; }
+  body:has(> .poule-print-only) > :not(.poule-print-only) { display: none !important; }
+  .poule-print-only { display: block !important; color: #000; background: #fff; font: 10pt Arial, sans-serif; }
+  .poule-print-only h2 { font-size: 15pt; margin: 0 0 5mm; break-after: avoid; }
+  .poule-print-only ol { columns: 2; column-gap: 12mm; padding-left: 7mm; margin: 0 0 8mm; }
+  .poule-print-only li { break-inside: avoid; padding: 2mm 0; }
+  .poule-print-only .print-score { white-space: nowrap; margin-left: 4mm; }
+  .poule-print-only table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9pt; }
+  .poule-print-only th, .poule-print-only td { border: 1px solid #555; height: 8mm; text-align: center; padding: 1mm; }
+  .poule-print-only th:first-child { width: 24%; text-align: left; overflow-wrap: anywhere; }
+  .poule-print-only tr { break-inside: avoid; }
+  .poule-print-only thead { display: table-header-group; }
+  .poule-print-only .print-diagonal { background: #ddd; print-color-adjust: exact; }
+}

@@ -6,15 +6,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
 import MobileMenu from './MobileMenu'
-
-const NAV_LINKS = [
-  { href: '/', label: 'Home' },
-  { href: '/events', label: 'Events' },
-  { href: '/achievements', label: 'Achievements' },
-  { href: '/members', label: 'Members' },
-  { href: '/shop', label: 'Shop' },
-  { href: '/friends', label: 'Friends of DUFC' },
-]
+import NavDropdown, { navItemClass } from './NavDropdown'
+import { PRIMARY_LINKS, MORE_LINKS, TOURNAMENT_LINKS } from '@/lib/navigation'
 
 export default function Header() {
   const pathname = usePathname()
@@ -31,51 +24,58 @@ export default function Header() {
     <>
       <header
         className={clsx(
-          'fixed top-0 left-0 right-0 z-30 h-16 transition-all duration-300',
+          'fixed top-0 left-0 right-0 z-50 h-16 transition-all duration-300',
           // Glassmorphism — always present; opacity deepens on scroll
           'backdrop-blur-md border-b border-white/10',
-          scrolled
-            ? 'bg-black/80 shadow-md'
-            : 'bg-black/30'
+          scrolled ? 'bg-black/80 shadow-md' : 'bg-black/80',
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 flex-shrink-0">
             <Image
-              src="/images/crest_white.png"
-              alt="DUFC crest"
-              width={36}
-              height={36}
+              src="/images/crest_with_swords.png"
+              alt="DUFC crest with crossed fencing swords"
+              width={44}
+              height={44}
               className="flex-shrink-0 opacity-90"
+              style={{
+                maskImage: "url(/images/crest_with_swords.png)",
+                maskMode: "luminance",
+                maskSize: "100% 100%",
+              }}
             />
-            <span className="font-heading text-white text-xl hidden sm:block tracking-tight">
+            <span className="font-heading text-white text-xl hidden xl:block tracking-tight">
               Dublin University Fencing Club
             </span>
-            <span className="font-heading text-white text-xl sm:hidden">DUFC</span>
+            <span className="font-heading text-white text-xl xl:hidden">
+              DUFC
+            </span>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-6">
-            {NAV_LINKS.map(link => (
+          <nav className="hidden lg:flex items-center gap-5">
+            {PRIMARY_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={clsx(
-                  'font-body text-sm font-medium uppercase tracking-widest transition-colors pb-0.5',
+                  navItemClass,
                   pathname === link.href
-                    ? 'text-white border-b-2 border-red'
-                    : 'text-white/70 hover:text-white border-b-2 border-transparent'
+                    ? 'text-white border-red'
+                    : 'text-white/70 hover:text-white border-transparent',
                 )}
               >
                 {link.label}
               </Link>
             ))}
+            <NavDropdown label="Club Tournaments" links={TOURNAMENT_LINKS} />
+            <NavDropdown label="More" links={MORE_LINKS} />
             <Link
               href="/membership"
               className={clsx(
-                'border border-red text-red px-3 py-1 rounded-full text-xs font-body font-medium uppercase tracking-wide hover:bg-red hover:text-white transition-colors ml-2',
-                pathname === '/membership' && 'bg-red text-white'
+                'h-9 inline-flex items-center justify-center border border-red text-red px-4 rounded-full text-xs leading-none font-body font-medium uppercase tracking-wide whitespace-nowrap hover:bg-red hover:text-white transition-colors',
+                pathname === '/membership' && 'bg-red text-white',
               )}
             >
               Join the Club
@@ -90,11 +90,25 @@ export default function Header() {
             aria-expanded={menuOpen}
           >
             {menuOpen ? (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>
             ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M3 12h18M3 6h18M3 18h18" />
               </svg>
             )}

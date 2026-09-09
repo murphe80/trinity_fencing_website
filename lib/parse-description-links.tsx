@@ -15,7 +15,7 @@ const LINK_CLASS = 'text-red hover:text-red-dark underline transition-colors'
  *
  * Returns an array of React elements with clickable links and proper formatting.
  */
-export function parseDescriptionWithLinks(description: string): React.ReactNode[] {
+export function parseDescriptionWithLinks(description: string, hideFeatured = false): React.ReactNode[] {
   const parts: React.ReactNode[] = []
   let remaining = description
   let key = 0
@@ -29,7 +29,7 @@ export function parseDescriptionWithLinks(description: string): React.ReactNode[
     if (linkMatch) {
       const beforeLink = remaining.substring(0, linkMatch.index)
       if (beforeLink) {
-        parts.push(...parseTextWithBreaks(beforeLink, key))
+        parts.push(...parseTextWithBreaks(beforeLink, key, hideFeatured))
         key += 100
       }
 
@@ -41,7 +41,7 @@ export function parseDescriptionWithLinks(description: string): React.ReactNode[
           rel="noopener noreferrer"
           className={LINK_CLASS}
         >
-          {linkMatch.text}
+          {hideFeatured ? removeFeaturedMarker(linkMatch.text) : linkMatch.text}
         </a>
       )
 
@@ -50,7 +50,7 @@ export function parseDescriptionWithLinks(description: string): React.ReactNode[
     }
 
     // No more links found, add the remaining text (parsing <br> tags)
-    parts.push(...parseTextWithBreaks(remaining, key))
+    parts.push(...parseTextWithBreaks(remaining, key, hideFeatured))
     break
   }
 
@@ -63,7 +63,7 @@ export { extractFirstDescriptionLink }
  * Helper function to parse text containing <br> or <br/> tags
  * and convert them to line breaks in React
  */
-function parseTextWithBreaks(text: string, startKey: number): React.ReactNode[] {
+function parseTextWithBreaks(text: string, startKey: number, hideFeatured = false): React.ReactNode[] {
   const parts: React.ReactNode[] = []
   const cleanText = text
     .replace(/<br\s*\/?>/gi, '<br>')
@@ -72,7 +72,8 @@ function parseTextWithBreaks(text: string, startKey: number): React.ReactNode[] 
   const segments = cleanText.split(/<br>/i)
 
   segments.forEach((segment, index) => {
-    if (segment) {
+    if (hideFeatured) segment = removeFeaturedMarker(segment)
+    if (segment.trim()) {
       parts.push(<span key={`text-${startKey}-${index}`}>{decodeHtmlEntities(segment)}</span>)
     }
 
@@ -83,4 +84,9 @@ function parseTextWithBreaks(text: string, startKey: number): React.ReactNode[] 
   })
 
   return parts
+}
+
+// Strip calendar metadata only from display text, leaving URLs and source data intact.
+function removeFeaturedMarker(text: string) {
+  return text.replace(/\bFeatured\b/gi, '').replace(/[ \t]{2,}/g, ' ')
 }

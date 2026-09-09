@@ -1,4 +1,3 @@
-
 // Preferred environment variable:
 //   GOOGLE_SERVICE_ACCOUNT_JSON
 //
@@ -8,6 +7,7 @@
 //   GOOGLE_REFRESH_TOKEN
 
 import { google } from 'googleapis'
+import { readFileSync } from 'node:fs'
 
 const GOOGLE_API_SCOPES = [
   'https://www.googleapis.com/auth/calendar.readonly',
@@ -21,7 +21,11 @@ type ServiceAccountCredentials = {
 }
 
 export function getGoogleAuthClient() {
-  const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON
+  const serviceAccountJson =
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON ||
+    (process.env.GOOGLE_APPLICATION_CREDENTIALS
+      ? readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8')
+      : undefined)
 
   if (serviceAccountJson) {
     let credentials: ServiceAccountCredentials
@@ -37,7 +41,7 @@ export function getGoogleAuthClient() {
 
     if (!clientEmail || !privateKey) {
       throw new Error(
-        'GOOGLE_SERVICE_ACCOUNT_JSON must include client_email and private_key'
+        'GOOGLE_SERVICE_ACCOUNT_JSON must include client_email and private_key',
       )
     }
 
@@ -55,7 +59,7 @@ export function getGoogleAuthClient() {
   if (!clientId || !clientSecret || !refreshToken) {
     throw new Error(
       'Google credentials are not configured. ' +
-      'Set GOOGLE_SERVICE_ACCOUNT_JSON, or set legacy GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REFRESH_TOKEN in .env.local'
+        'Set GOOGLE_SERVICE_ACCOUNT_JSON, or set legacy GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REFRESH_TOKEN in .env.local',
     )
   }
 

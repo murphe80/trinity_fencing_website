@@ -1,8 +1,19 @@
+import { googleErrorSummary } from '@/lib/google-error'
 import { google } from 'googleapis'
-import type { Achievement, CommitteeMember, Coach, HonoraryMember, InstagramFeature } from '@/types'
+import type {
+  Achievement,
+  CommitteeMember,
+  Coach,
+  HonoraryMember,
+  InstagramFeature,
+} from '@/types'
 import { GOOGLE_CONFIG } from './constants'
 import { getGoogleAuthClient } from './google-auth'
-import { driveUrlToImageSrc, isNextImageSrc, safeDriveImageUrl } from './drive-url'
+import {
+  driveUrlToImageSrc,
+  isNextImageSrc,
+  safeDriveImageUrl,
+} from './drive-url'
 
 async function getSheetValues(range: string): Promise<string[][]> {
   const auth = getGoogleAuthClient()
@@ -19,42 +30,47 @@ export async function getAchievements(): Promise<Achievement[]> {
   try {
     const rows = await getSheetValues('Achievements!A:J')
     return rows
-      .map(row => ({
+      .map((row) => ({
         year: row[0] ?? '',
         date: row[1] ?? '',
         eventName: row[2] ?? '',
         level: row[3] ?? '',
         weapon: row[4] ?? '',
         result: row[5] ?? '',
-        fencers: (row[6] ?? '').split(',').map(s => s.trim()).filter(Boolean),
+        fencers: (row[6] ?? '')
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean),
         description: row[7] ?? '',
         imageUrls: (row[8] ?? '')
           .split(',')
-          .map(s => s.trim())
+          .map((s) => s.trim())
           .filter(Boolean)
           .map(driveUrlToImageSrc)
           .filter(isNextImageSrc),
         featured: (row[9] ?? '').toUpperCase() === 'TRUE',
       }))
-      .filter(a => a.eventName)
+      .filter((a) => a.eventName)
       .sort((a, b) => b.date.localeCompare(a.date))
   } catch (err) {
-    console.error('Failed to fetch achievements:', err)
+    console.error('Failed to fetch achievements:', googleErrorSummary(err))
     return []
   }
 }
 
-export async function getFeaturedAchievements(limit = 3): Promise<Achievement[]> {
+export async function getFeaturedAchievements(
+  limit = 3,
+): Promise<Achievement[]> {
   const all = await getAchievements()
-  return all.filter(a => a.featured).slice(0, limit)
+  return all.filter((a) => a.featured).slice(0, limit)
 }
 
 export async function getCommitteeMembers(): Promise<CommitteeMember[]> {
   try {
     const rows = await getSheetValues('Committee!A:G')
     return rows
-      .filter(row => (row[6] ?? '').trim().toUpperCase() !== 'FALSE') // optional legacy "active" column G
-      .map(row => ({
+      .filter((row) => (row[6] ?? '').trim().toUpperCase() !== 'FALSE') // optional legacy "active" column G
+      .map((row) => ({
         name: row[0] ?? '',
         role: row[1] ?? '',
         email: row[2] || undefined,
@@ -62,10 +78,10 @@ export async function getCommitteeMembers(): Promise<CommitteeMember[]> {
         photoUrl: safeDriveImageUrl(row[4]),
         displayOrder: parseInt(row[5] ?? '99', 10),
       }))
-      .filter(m => m.name)
+      .filter((m) => m.name)
       .sort((a, b) => a.displayOrder - b.displayOrder)
   } catch (err) {
-    console.error('Failed to fetch committee members:', err)
+    console.error('Failed to fetch committee members:', googleErrorSummary(err))
     return []
   }
 }
@@ -74,16 +90,16 @@ export async function getCoaches(): Promise<Coach[]> {
   try {
     const rows = await getSheetValues('Coach!A:E')
     return rows
-      .map(row => ({
+      .map((row) => ({
         name: row[0] ?? '',
         title: row[1] ?? '',
         bio: row[2] ?? '',
         photoUrl: safeDriveImageUrl(row[3]),
         qualifications: row[4] || undefined,
       }))
-      .filter(coach => coach.name)
+      .filter((coach) => coach.name)
   } catch (err) {
-    console.error('Failed to fetch coaches:', err)
+    console.error('Failed to fetch coaches:', googleErrorSummary(err))
     return []
   }
 }
@@ -97,14 +113,14 @@ export async function getHonoraryMembers(): Promise<HonoraryMember[]> {
   try {
     const rows = await getSheetValues('Honorary Members!A:C')
     return rows
-      .map(row => ({
+      .map((row) => ({
         name: row[0] ?? '',
         yearAwarded: parseInt(row[1] ?? '0', 10),
         note: row[2] || undefined,
       }))
-      .filter(m => m.name)
+      .filter((m) => m.name)
   } catch (err) {
-    console.error('Failed to fetch honorary members:', err)
+    console.error('Failed to fetch honorary members:', googleErrorSummary(err))
     return []
   }
 }
@@ -113,16 +129,19 @@ export async function getInstagramFeatures(): Promise<InstagramFeature[]> {
   try {
     const rows = await getSheetValues('Instagram Featured!A:D')
     return rows
-      .map(row => ({
+      .map((row) => ({
         imageUrl: safeDriveImageUrl(row[0]) ?? '',
         caption: row[1] ?? '',
         instagramLink: row[2] || undefined,
         displayOrder: parseInt(row[3] ?? '99', 10),
       }))
-      .filter(f => f.imageUrl)
+      .filter((f) => f.imageUrl)
       .sort((a, b) => a.displayOrder - b.displayOrder)
   } catch (err) {
-    console.error('Failed to fetch Instagram features:', err)
+    console.error(
+      'Failed to fetch Instagram features:',
+      googleErrorSummary(err),
+    )
     return []
   }
 }

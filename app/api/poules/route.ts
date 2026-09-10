@@ -1,6 +1,14 @@
 import { googleErrorSummary } from '@/lib/google-error'
 import { NextRequest, NextResponse } from 'next/server'
-import { savePoule, PartialPouleSaveError } from '@/lib/club-drive'
+import {
+  savePouleToDestination,
+  PartialPouleSaveError,
+  DestinationSaveError,
+} from '@/lib/club-drive'
+import {
+  SAVE_DESTINATIONS,
+  type SaveDestination,
+} from '@/lib/poule-destination'
 import { validatePoule } from '@/lib/tournament'
 import {
   sessionFrom,
@@ -26,10 +34,15 @@ export async function POST(request: NextRequest) {
   if (Number(request.headers.get('content-length') ?? 0) > 50000)
     return NextResponse.json({ error: 'Poule is too large.' }, { status: 413 })
   let poule
+  let destination: SaveDestination
   try {
     const text = await request.text()
     if (text.length > 50000) throw new Error('Poule is too large.')
-    poule = validatePoule(JSON.parse(text))
+    const raw = JSON.parse(text)
+    destination = raw.destination ?? 'club'
+    if (!SAVE_DESTINATIONS.includes(destination))
+      throw new Error('Choose a valid save destination.')
+    poule = validatePoule(raw)
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Invalid poule.' },
@@ -40,7 +53,11 @@ export async function POST(request: NextRequest) {
   client.setCredentials(session.tokens)
   try {
     // Google's client automatically refreshes expired access tokens during these requests.
-    const result = await savePoule(poule, client)
+    const result = await savePouleToDestination(
+      { ...poule, prize: '', prizeWinner: '' },
+      client,
+      destination,
+    )
     const response = NextResponse.json(result, {
       headers: { 'Cache-Control': 'no-store' },
     })
@@ -64,11 +81,12 @@ export async function POST(request: NextRequest) {
       {
         reconnect,
         error:
-          error instanceof PartialPouleSaveError
+          error instanceof PartialPouleSaveError ||
+          error instanceof DestinationSaveError
             ? error.message
             : reconnect
               ? 'Your Google connection expired. Please reconnect and save again.'
-              : 'Could not save. Check that your Google account has Editor access to the both club results folders and available Drive storage. Your draft is retained and you can download the results.',
+              : 'Could not save. Check available Google Drive storage. Your draft is retained and you can download it.',
       },
       { status: reconnect ? 401 : 503 },
     )

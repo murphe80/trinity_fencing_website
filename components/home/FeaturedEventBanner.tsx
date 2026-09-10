@@ -47,14 +47,14 @@ export default function FeaturedEventBanner({
             <div className="featured-group" key={group}>
               {[0, 1].map((copy) => (
                 <div className="featured-item" key={copy}>
-                  <span className="text-[11px] uppercase tracking-[0.18em] font-semibold">
+                  <span className="featured-label uppercase tracking-[0.18em] font-semibold">
                    Up next!
                   </span>
                   <span className="featured-divider" />
-                  <span className="font-heading text-xl sm:text-2xl leading-none">
+                  <span className="featured-title font-heading leading-none">
                     {event.title}
                   </span>
-                  <span className="text-xs sm:text-sm leading-none text-white/90">
+                  <span className="featured-details leading-none text-white/90">
                     {details}
                   </span>
                   <span aria-hidden="true" className="text-lg">
@@ -69,7 +69,7 @@ export default function FeaturedEventBanner({
       </a>
       <button
         type="button"
-        className="featured-pause flex items-center justify-center w-14 shrink-0 border-l border-white/25 hover:text-white/70"
+        className="featured-pause flex items-center justify-center w-11 sm:w-14 shrink-0 border-l border-white/25 hover:text-white/70"
         aria-label={
           paused
             ? 'Resume featured event scrolling'

@@ -11,7 +11,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export const SESSION_COOKIE = 'dufc_drive_session'
 export const STATE_COOKIE = 'dufc_drive_state'
 export const TRACKER = '/tournaments/poule-tracker'
-export const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive'
+export const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file'
 type Tokens = {
   access_token?: string | null
   refresh_token?: string | null
@@ -127,11 +127,26 @@ export function unseal<T extends { expires: number }>(
     return null
   }
 }
+export function hasUploadScope(scope?: string) {
+  const scopes = scope?.trim().split(/\s+/) ?? []
+  return scopes.length === 1 && scopes[0] === DRIVE_SCOPE
+}
 export function sessionFrom(request: NextRequest) {
-  return unseal<UploadSession>(
+  const session = unseal<UploadSession>(
     request.cookies.get(SESSION_COOKIE)?.value,
     SESSION_COOKIE,
   )
+  // Reject existing broad-scope sessions, including when they also contain drive.file.
+  return session && hasUploadScope(session.tokens.scope) ? session : null
+}
+export function pickerConfig() {
+  const apiKey = process.env.GOOGLE_PICKER_API_KEY
+  const appId = process.env.GOOGLE_CLOUD_PROJECT_NUMBER
+  if (!apiKey || !appId || !/^\d+$/.test(appId))
+    throw new Error(
+      'Google folder selection is not configured. Please contact the club; PDF downloads are still available.',
+    )
+  return { apiKey, appId }
 }
 export function setPrivateCookie(
   response: NextResponse,

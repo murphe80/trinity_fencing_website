@@ -74,7 +74,7 @@ export default function AchievementCard({ achievement }: Props) {
           )} />
         </div>
 
-        <div className="flex-1 bg-white rounded-lg shadow-sm p-5 md:p-6 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+        <div className="flex-1 min-w-0 bg-white rounded-lg shadow-sm p-5 md:p-6 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
           <div className="flex items-start gap-3 mb-1.5">
             <h3 className="font-heading text-xl font-medium text-black flex-1 min-w-0">
               {achievement.eventName}
@@ -145,7 +145,8 @@ export default function AchievementCard({ achievement }: Props) {
                 <button
                   key={i}
                   onClick={() => { setLightboxIndex(i); setLightboxOpen(true) }}
-                  className="w-16 h-16 rounded overflow-hidden bg-grey-light hover:opacity-80 hover:scale-105 transition-all duration-200"
+                  aria-label={`View achievement photo ${i + 1}`}
+                  className="w-16 h-16 shrink-0 rounded overflow-hidden bg-grey-light hover:opacity-80 hover:scale-105 transition-all duration-200"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={src} alt="" className="w-full h-full object-cover" />

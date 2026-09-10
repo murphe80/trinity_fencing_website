@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { assertUploadFolders } from '@/lib/club-drive'
 import {
   oauthClient,
   redirectFor,
@@ -7,7 +6,7 @@ import {
   setPrivateCookie,
   storeSession,
   STATE_COOKIE,
-  DRIVE_SCOPE,
+  hasUploadScope,
   TRACKER,
   type AuthState,
 } from '@/lib/google-upload-session'
@@ -50,11 +49,10 @@ export async function GET(request: NextRequest) {
       code,
       codeVerifier: state.verifier,
     })
-    if (!tokens.access_token || !tokens.scope?.split(' ').includes(DRIVE_SCOPE))
-      return finish('permission')
+    if (!tokens.access_token || !hasUploadScope(tokens.scope))
+      return finish('scope')
     client.setCredentials(tokens)
-    // The signed-in account must already be able to upload into this exact club folder.
-    await assertUploadFolders(client)
+    // First-time folder access is granted through Picker after the OAuth callback.
     const response = finish('connected')
     storeSession(response, request, {
       tokens,

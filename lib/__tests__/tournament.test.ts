@@ -97,7 +97,8 @@ test('server validation rejects incomplete, duplicate, out-of-range and tied bou
   assert.throws(() => validatePoule(date))
   const prize = fixture()
   prize.prize = 'Best salute'
-  assert.throws(() => validatePoule(prize))
+  // Legacy prize metadata does not block a complete poule after prize entry was removed.
+  assert.doesNotThrow(() => validatePoule(prize))
   assert.doesNotThrow(() => validatePoule(prize, false))
 })
 test('incomplete backups can be restored but cannot be published', () => {

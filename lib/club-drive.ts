@@ -1,4 +1,5 @@
 import { google } from 'googleapis'
+import { type SaveDestination, destinationLabels } from './poule-destination'
 import { poulePdf } from './poule-pdf'
 import { Readable } from 'node:stream'
 import { unstable_cache } from 'next/cache'
@@ -78,18 +79,21 @@ export async function assertUploadFolders(
   }
 }
 export class PartialPouleSaveError extends Error {
-  constructor() {
+  constructor(destination: 'club' | 'personal' = 'club') {
     super(
-      'The PDF was saved, but the JSON could not be saved. The tournament has not been updated by this attempt. Retry Save results to Drive; an extra PDF copy may be created.',
+      destination === 'personal'
+        ? 'The personal PDF was saved, but its JSON could not be saved. Retry may create an extra PDF. Nothing was uploaded to the club folders.'
+        : 'The PDF was saved, but the JSON could not be saved. The tournament has not been updated by this attempt. Retry Save results to Drive; an extra PDF copy may be created.',
     )
   }
 }
 export async function savePoule(
   poule: Poule,
   auth: InstanceType<typeof google.auth.OAuth2>,
+  destination: 'club' | 'personal' = 'club',
 ) {
   validatePoule(poule)
-  await assertUploadFolders(auth)
+  if (destination === 'club') await assertUploadFolders(auth)
   const drive = google.drive({ version: 'v3', auth })
   const saved = { ...poule, savedAt: new Date().toISOString() }
   const revision = saved.savedAt.replace(/[:.]/g, '-')
@@ -99,7 +103,7 @@ export async function savePoule(
   const human = await drive.files.create({
     requestBody: {
       name: base + '.pdf',
-      parents: [folders.pdfResults],
+      parents: destination === 'club' ? [folders.pdfResults] : undefined,
       mimeType: 'application/pdf',
     },
     media: { mimeType: 'application/pdf', body: Readable.from([pdf]) },
@@ -110,7 +114,7 @@ export async function savePoule(
     const result = await drive.files.create({
       requestBody: {
         name: base + '.json',
-        parents: [folders.results],
+        parents: destination === 'club' ? [folders.results] : undefined,
         mimeType: 'application/json',
       },
       media: {
@@ -127,7 +131,26 @@ export async function savePoule(
       pdfName: base + '.pdf',
     }
   } catch {
-    throw new PartialPouleSaveError()
+    throw new PartialPouleSaveError(destination)
+  }
+}
+export class DestinationSaveError extends Error {}
+export async function savePouleToDestination(
+  poule: Poule,
+  auth: InstanceType<typeof google.auth.OAuth2>,
+  destination: SaveDestination,
+) {
+  if (destination !== 'both') return savePoule(poule, auth, destination)
+  // Check club access before creating any personal copies.
+  await assertUploadFolders(auth)
+  const personal = await savePoule(poule, auth, 'personal')
+  try {
+    const club = await savePoule(poule, auth, 'club')
+    return { personal, club }
+  } catch (error) {
+    throw new DestinationSaveError(
+      `Both files were saved to ${destinationLabels.personal}, but the club upload did not complete. ${error instanceof PartialPouleSaveError ? error.message : 'Try saving to the club folders only to avoid duplicate personal copies.'}`,
+    )
   }
 }
 export async function readPublished(cutoff: string): Promise<Poule[]> {

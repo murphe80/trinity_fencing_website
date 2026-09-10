@@ -2,22 +2,27 @@
 
 The site now has a DUFC crest favicon, a featured-event banner, `/policies`, `/tournaments/poule-tracker`, and `/tournaments/wheel`. These routes use the existing cream, red, black and Garamond design.
 
-## Render setup
+## Hosting setup (Render or Vercel)
 
-1. Keep the existing Google service account environment variable. The results folder `1G1nFs7hbro19OUU2RZbDSlRv_x9gq7i8` was verified against live Drive and is now the default. Set `DRIVE_POULE_RESULTS_FOLDER_ID` only to override it. Policies and photo folder IDs default to the supplied folders and can be overridden with `DRIVE_POLICIES_FOLDER_ID` and `DRIVE_TOURNAMENT_PHOTOS_FOLDER_ID`.
-2. Set **GOOGLE_OAUTH_CLIENT_JSON** on the Render website service to the complete downloaded OAuth web-client JSON. Keep it secret. Register the exact deployed callback URL in the Google Cloud OAuth client: `https://www.trinityfencing.ie/api/auth/google/callback`. Local callbacks are `http://localhost:3000/api/auth/google/callback` and `http://127.0.0.1:3000/api/auth/google/callback`. Enable the Google Drive API in that project.
-3. Give each organiser’s Google account **Editor** access to both results folders, or sign in using the club account. The service account still needs Viewer access to read the uploaded results. Fencers do not enter IDs, secrets or organiser keys.
-4. Deploy and try a completed poule using **Connect Google to save results**. Approve Google’s permission screen, return to the recovered draft, then select **Save results to Drive**. Downloading results remains available without Google sign-in.
+1. Keep `GOOGLE_SERVICE_ACCOUNT_JSON` configured. The service account reads club sources; it never owns or writes uploads. It needs Viewer access to the JSON folder.
+2. Set `GOOGLE_OAUTH_CLIENT_JSON` to the downloaded OAuth **web-client** JSON. Register the exact website callback, for example `https://www.trinityfencing.ie/api/auth/google/callback`. Local callbacks are `http://localhost:3000/api/auth/google/callback` and `http://127.0.0.1:3000/api/auth/google/callback`. Enable Drive API. Keep the OAuth app External / In production so public Google accounts can connect, subject to Google account restrictions.
+3. For organiser folder selection, enable **Google Picker API** in the same project. Set `GOOGLE_PICKER_API_KEY` and `GOOGLE_CLOUD_PROJECT_NUMBER` (the numeric project number in Google Cloud project settings). Restrict the browser key to Google Picker API and website referrers `https://www.trinityfencing.ie/*`, `https://docs.google.com/*`, and actual additional site origins. Add localhost origins for local tests. See [Google’s Picker setup guide](https://developers.google.com/workspace/drive/picker/guides/web-picker).
+4. The club folders now have public editing access; Google must report that the connected account can add files. No website allowlist or organiser key is required; Google’s folder permissions are checked on every save.
+5. Declare only `https://www.googleapis.com/auth/drive.file` on the **user OAuth consent screen**. Remove broad Drive, Calendar and Sheets scopes from that screen; retain the service account’s separate read-only scopes and enabled APIs. Existing broad-scope connections must reconnect. If Google returns an old combined grant, remove the app in Google Account connections and reconnect.
 
-### Google sign-in
+PDF folder: `1jUq8aNtnFqPnrrgABF2lBU1EmVXQUpln` (`DRIVE_POULE_PDF_FOLDER_ID`). Approved JSON folder: `1G1nFs7hbro19OUU2RZbDSlRv_x9gq7i8` (`DRIVE_POULE_RESULTS_FOLDER_ID`). These are defaults; update any old environment overrides. The league reads **only this JSON folder**.
 
-Each browser connects its own Google account. Uploads use that account’s storage and existing folder permissions. The server verifies the destination folder and permission before each upload; it never uses the service account or a shared club token for writing. Google’s full Drive scope is requested to access this pre-existing folder without a separate Google Picker step. The consent screen therefore describes broad Drive access, although this application only creates results in the configured folder. Complete any Google verification requirements for this scope before a public rollout.
+### Direct upload workflow
 
-The OAuth secret stays on the server. Tokens are stored in an encrypted, HttpOnly, SameSite cookie, marked Secure on HTTPS; JavaScript cannot read them. The encryption key is derived from the OAuth client secret, so no separate organiser/session secret is required. Connections last up to 30 days in this browser. Short-lived access tokens refresh automatically; revoked or expired connections prompt reconnection. Disconnect Google clears the browser connection; Google Account settings can revoke the grant itself. Rotating the OAuth client secret invalidates browser connections. OAuth uses a short-lived state cookie, PKCE and registered callback validation; uploads and disconnects require a matching Origin.
+Complete a poule, download a PDF or connect Google and select **Save results to Drive**. On first use, Google Picker asks you to select both club folders. The app checks Editor access, creates the PDF in the human-readable folder, then creates matching JSON in the tournament folder. There is no review queue or approval step. Monitor and manage results directly in Drive. Folders are not made public and their permissions are not changed.
 
-The Saturday cutoff works automatically when the league is visited. A Render cron is **optional** cache warming, and ordinary committee use requires no cron secret. If desired, use `render-wheel.yaml`, set `SITE_URL` and a private `CRON_SECRET` on the job and web service, and run `node scripts/refresh-wheel.mjs` at `0 9,10 * * 6`. The Dublin-time guard handles daylight saving.
+Uploads use the signed-in account’s storage. A failed JSON upload may leave a PDF copy; retrying saves another revision. Re-saving the same poule preserves its ID so the league counts only the latest eligible revision. Existing pending files from the former review workflow are not automatically imported or deleted.
 
-The application creates matching PDF and JSON result revisions. Saving the same poule again writes a new dated revision, and the league selects only its latest eligible revision. Earlier revisions preserve the published scores when a correction is made after the cutoff. It does not modify permissions or unrelated files. Keep a backup before starting a new poule. The latest save wins if multiple organisers edit the same poule; coordinate score entry on one device.
+### Google connection security and lifetime
+
+The OAuth secret stays server-side. Access and refresh tokens are stored in an encrypted, HttpOnly, SameSite cookie, Secure on HTTPS, for up to 30 days. Tokens refresh automatically when used. Only a short-lived access token is passed to Picker in browser memory for organiser folder selection. Refresh tokens are not exposed to JavaScript or local storage. OAuth uses PKCE, encrypted state and exact registered callbacks. Mutations require a matching Origin. No token can be guaranteed never to expire: revocation and Google security policies may require reconnecting. Disconnect clears the browser connection; Google Account connections can revoke the grant. Rotating the client secret invalidates browser sessions.
+
+The Saturday cutoff works on the first league visit after 10am Dublin. Cron is optional cache warming; ordinary use needs no `CRON_SECRET` or `TOURNAMENT_ADMIN_KEY`. For optional Render scheduling see `render-wheel.yaml` and `scripts/refresh-wheel.mjs`.
 
 ## Featured calendar events
 
@@ -29,11 +34,11 @@ Add, rename, update or remove files directly in the configured policies folder. 
 
 ## Poule tracker
 
-Enter 2–20 unique full names, a weapon and date. The tracker uses round-robin scheduling so every pair fences once, with rotating rounds to spread bouts across participants. This is club scheduling, not an official FIE bout-order claim. Score each bout from 0–5; timed bouts may finish below five, but ties must be resolved. Drafts, including scores and names, stay in this browser until replaced or cleared. Download completed results as a PDF containing the bout list, scores and poule grid. Saving to Drive creates both that PDF and a machine-readable JSON revision; the tournament reads only JSON. Incomplete or tied bouts must be resolved before downloading. The tracker automatically recovers the current draft from the same browser. Print sheet includes only the numbered person-vs-person bout list and poule grid, including current scores or blank cells. The grid prints even when its screen disclosure is closed.
+Enter 2–20 unique full names, a weapon and date. The tracker uses round-robin scheduling so every pair fences once, with rotating rounds to spread bouts across participants. This is club scheduling, not an official FIE bout-order claim. Score each bout from 0–5; timed bouts may finish below five, but ties must be resolved. Drafts, including scores and names, stay in this browser until replaced or cleared. Download completed results as a PDF containing the bout list, scores and poule grid. Submitting creates both that PDF and a machine-readable JSON for review; only organiser-JSON in the club folder contributes to the tournament. Incomplete or tied bouts must be resolved before downloading. The tracker automatically recovers the current draft from the same browser. Print sheet includes only the numbered person-vs-person bout list and poule grid, including current scores or blank cells. The grid prints even when its screen disclosure is closed.
 
 Poule ranks use victory ratio, indicator, then touches scored. Exactly tied leaders share the poule win. League ranks use only cumulative indicator, as requested; alphabetical display order does not break equal ranks. The fun prize does not affect league points.
 
-Tick “Count towards The Wheel Tournament” to include a result in the league. Wheel prize and winner entry is not part of the poule tracker. Saving requires a complete valid poule and a connected Google account with permission to upload to the results folder. The server recalculates all totals from the bouts; client-supplied totals are never trusted. Files are named `YYYY-MM-DD_weapon_poule-id_saved-at.json`. Saving the current draft again creates a revision with the same poule ID; new poules get new IDs. Revisions are not counted as additional poules.
+Tick “Count towards The Wheel Tournament” to include eligible saved results. Wheel prize and winner entry is not part of the tracker, and upload processing clears this legacy metadata. Submission requires a complete valid poule and a connected Google account. Totals are recalculated from bouts. Files include the date and weapon in their names.
 
 ## The Wheel Tournament
 
@@ -63,13 +68,12 @@ The existing weekly cutoff also works on the first visit after Saturday 10am. Th
 
 [Render cron jobs use UTC](https://render.com/docs/cronjobs); the two UTC runs and Dublin-time guard keep the user-visible schedule stable through daylight saving.
 
-## Separate result folders
+## Verification
 
-- Human-readable PDFs: `1jUq8aNtnFqPnrrgABF2lBU1EmVXQUpln` (`DRIVE_POULE_PDF_FOLDER_ID`).
-- JSON used by the tournament: `1G1nFs7hbro19OUU2RZbDSlRv_x9gq7i8` (`DRIVE_POULE_RESULTS_FOLDER_ID`).
+Automated tests cover narrow OAuth scopes, cookie/origin checks, folder selection, direct PDF/JSON uploads, partial failures and league publication. Google API calls are mocked in upload tests. A real upload check requires Google consent and Editor access to both destination folders. Service-account read checks alone do not verify uploads or Picker.
 
-These are the new defaults. **Update any existing Render override of DRIVE_POULE_RESULTS_FOLDER_ID** to the new JSON folder; an old environment value takes precedence over the default. The service account needs Viewer access to the JSON folder. Organisers need Editor access to both folders. The OAuth client JSON remains unchanged.
+## Save destinations
 
-Each save checks both folders first, then uploads PDF followed by JSON, with the same dated revision basename. If the PDF fails, JSON is not published. If JSON fails, the page reports the partial save and retains the draft. Retry may leave an additional PDF; league revision selection prevents duplicate counting. Google Drive does not offer an atomic two-file upload.
+Fencers choose **My personal Google Drive**, **Club results folders**, or **Both**. Personal saves create PDF and JSON in the signed-in account’s My Drive with no club sharing or Picker requirement. Club saves use the two configured folders and Picker with `drive.file`. Both creates four files: a personal pair first, then a club pair. Club access is checked before starting; partial failures state what completed. Only club JSON contributes to the league. Destination selection survives Google sign-in and changing it resets the current save confirmation.
 
-The download action generates the PDF on the website server and requires no Google connection. Printing remains the bout list and grid. Downloaded PDFs are for people; only saved JSON updates league results.
+The club has enabled public editing on its results folders, so a separate invitation should not be necessary when Google recognises those permissions. The server still checks Google’s `canAddChildren` capability. Sign-in and Picker remain necessary for file-specific OAuth authorisation. The upload page discloses public access before club saves. The website does not change sharing permissions.

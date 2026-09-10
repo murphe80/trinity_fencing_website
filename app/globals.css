@@ -90,7 +90,7 @@ progress::-moz-progress-bar { background: #C8102E; border-radius: 1rem; }
 .featured-window { flex: 1; }
 .featured-track { display: flex; width: max-content; animation: featured-conveyor 40s linear infinite; }
 .featured-group { display: flex; flex-shrink: 0; min-width: 100vw; justify-content: space-around; }
-.featured-item { display: flex; align-items: center; flex-shrink: 0; gap: 1.25rem; padding: 0 1.5rem; height: 3.5rem; white-space: nowrap; }
+.featured-item { display: flex; align-items: center; flex-shrink: 0; gap: clamp(.65rem, 2vw, 1.25rem); padding: 0 clamp(.75rem, 2vw, 1.5rem); height: clamp(2.75rem, 6vw, 3.5rem); white-space: nowrap; }
 .featured-divider { height: 1rem; width: 1px; flex-shrink: 0; background: rgb(255 255 255 / 35%); }
 .featured-banner[data-paused='true'] .featured-track,
 .featured-banner:hover .featured-track,
@@ -120,3 +120,10 @@ progress::-moz-progress-bar { background: #C8102E; border-radius: 1rem; }
   .poule-print-only thead { display: table-header-group; }
   .poule-print-only .print-diagonal { background: #ddd; print-color-adjust: exact; }
 }
+
+.featured-title { font-size: clamp(.9375rem, 2.5vw, 1.5rem); }
+.featured-label { font-size: clamp(.5625rem, 1.2vw, .6875rem); }
+.featured-details { font-size: clamp(.6875rem, 1.5vw, .875rem); }
+.poule-date { min-width: 0; max-width: 100%; min-height: 3rem; height: 3rem; appearance: none; }
+.poule-date::-webkit-date-and-time-value { min-width: 0; text-align: left; }
+.poule-date::-webkit-datetime-edit { min-width: 0; padding: 0; }

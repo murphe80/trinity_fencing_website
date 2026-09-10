@@ -1,5 +1,11 @@
 'use client'
-import { useEffect, useState } from 'react'
+import {
+  SAVE_DESTINATIONS,
+  destinationLabels,
+  type SaveDestination,
+} from '@/lib/poule-destination'
+import { selectResultFolders } from '@/lib/google-folder-picker'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import PoulePrint from './PoulePrint'
 import {
@@ -13,6 +19,7 @@ import {
   type Weapon,
 } from '@/lib/tournament'
 const STORAGE = 'dufc-poule-draft-v1'
+const DESTINATION_STORAGE = 'dufc-poule-destination'
 export default function PouleTracker() {
   const [names, setNames] = useState(''),
     [weapon, setWeapon] = useState<Weapon>('foil'),
@@ -22,10 +29,28 @@ export default function PouleTracker() {
     [message, setMessage] = useState(''),
     [busy, setBusy] = useState(false),
     [ready, setReady] = useState(false)
+  const [destination, setDestination] = useState<SaveDestination>('club')
+  const [savedSnapshot, setSavedSnapshot] = useState<string | null>(null)
+  const [returnedFromGoogle, setReturnedFromGoogle] = useState(false)
+  const [saveStage, setSaveStage] = useState<string | null>(null)
+  const saveHeading = useRef<HTMLHeadingElement>(null)
+  const savedToDrive = Boolean(
+    poule && savedSnapshot === JSON.stringify({ poule, destination }),
+  )
+  useEffect(() => {
+    if (ready && poule && returnedFromGoogle) {
+      saveHeading.current?.scrollIntoView({ block: 'center' })
+      saveHeading.current?.focus({ preventScroll: true })
+      setReturnedFromGoogle(false)
+    }
+  }, [ready, poule, returnedFromGoogle])
   useEffect(() => {
     const p = dublinParts(new Date())
     setDate(`${p.year}-${p.month}-${p.day}`)
     try {
+      const previousDestination = localStorage.getItem(DESTINATION_STORAGE)
+      if (SAVE_DESTINATIONS.includes(previousDestination as SaveDestination))
+        setDestination(previousDestination as SaveDestination)
       const saved = localStorage.getItem(STORAGE)
       if (saved) {
         const draft = JSON.parse(saved)
@@ -38,15 +63,16 @@ export default function PouleTracker() {
     }
     const outcome = new URLSearchParams(window.location.search).get('google')
     if (outcome) {
+      setReturnedFromGoogle(true)
       const messages: Record<string, string> = {
         connected:
-          'Google connected. Your draft is ready: select Save results to Drive.',
+          'Step 1 complete: Google connected. Your results have NOT been saved. Select “2. Save results to Drive” below.',
         cancelled:
           'Google sign-in cancelled. You can still download your results.',
         permission:
           'Use a Google account with Editor access to the club’s PDF and JSON results folders.',
         scope:
-          'Drive permission is needed to upload results. Try connecting again.',
+          'Remove the previous Trinity Fencing Website connection in your Google Account connections, then reconnect here to grant file-only access.',
       }
       setMessage(
         messages[outcome] || 'Google could not connect. Please try again.',
@@ -126,6 +152,9 @@ export default function PouleTracker() {
   }
   async function save() {
     setBusy(true)
+    setSaveStage(
+      connected ? 'Checking folder access…' : 'Connecting to Google…',
+    )
     try {
       validatePoule(poule)
       if (!connected) {
@@ -137,28 +166,46 @@ export default function PouleTracker() {
             'Google uploads are not configured on this website yet. You can download your results instead.',
           )
         localStorage.setItem(STORAGE, JSON.stringify(poule))
+        localStorage.setItem(DESTINATION_STORAGE, destination)
         window.location.assign('/api/auth/google/start')
         return
       }
+      if (destination !== 'personal') {
+        const preparation = await fetch('/api/auth/google/picker', {
+          method: 'POST',
+        })
+        const selection = await preparation.json()
+        if (!preparation.ok) {
+          if (selection.reconnect) setConnected(false)
+          throw new Error(selection.error)
+        }
+        if (!selection.ready) {
+          setSaveStage('Select both folders in Google to continue…')
+          await selectResultFolders(selection)
+        }
+      }
+      setSaveStage('Uploading results…')
       const response = await fetch('/api/poules', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(poule),
+        body: JSON.stringify({ ...poule, destination }),
       })
       const result = await response.json()
       if (!response.ok) {
         if (result.reconnect) setConnected(false)
         throw new Error(result.error)
       }
+      setSavedSnapshot(JSON.stringify({ poule, destination }))
       setMessage(
-        `Saved PDF and JSON to their Drive folders. Wheel standings publish on Saturday at 10am.`,
+        `Saved PDF and JSON to ${destinationLabels[destination]}.${destination === 'personal' ? ' Personal copies do not update the club league.' : ' Eligible Wheel results appear at the next Saturday 10am publication.'}`,
       )
     } catch (error) {
       setMessage((error as Error).message)
     } finally {
       setBusy(false)
+      setSaveStage(null)
     }
   }
   const rows = poule ? standings(poule) : [],
@@ -196,10 +243,10 @@ export default function PouleTracker() {
                 ))}
               </select>
             </label>
-            <label>
+            <label className="min-w-0">
               Date
               <input
-                className="club-input"
+                className="club-input poule-date"
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
@@ -209,7 +256,7 @@ export default function PouleTracker() {
           <label className="block mt-6">
             Fencers{' '}
             <span className="text-grey-dark text-sm">
-              — one full name per line, 2–20 fencers
+              : one name per line, 2–20 fencers
             </span>
             <textarea
               className="club-input min-h-52"
@@ -219,9 +266,8 @@ export default function PouleTracker() {
             />
           </label>
           <p className="text-sm text-grey-dark mt-3">
-            Use the same full name every week so league points and profile
-            photos stay connected. Names and scores are saved in this browser
-            until you start a new poule.
+            Use the same name every week so league points and profile photos
+            stay connected.
           </p>
           <button
             className="club-button mt-6"
@@ -281,8 +327,7 @@ export default function PouleTracker() {
             <section className="club-card">
               <h2 className="font-heading text-3xl">On the piste</h2>
               <p className="text-sm text-grey-dark mt-2 mb-6">
-                Scores are out of 5. For a timed bout, enter the final
-                score.
+                Scores are out of 5. For a timed bout, enter the final score.
               </p>
               <div className="space-y-3">
                 {poule.bouts.map((b, i) => (
@@ -373,7 +418,6 @@ export default function PouleTracker() {
                 <p className="text-xs text-grey-dark mt-4">
                   V: victories · B: bouts · TS/TR: touches scored/received.
                   Ranked by victories, then indicator.
-           
                 </p>
               </section>
               <details className="club-card">
@@ -423,7 +467,13 @@ export default function PouleTracker() {
                 </div>
               </details>
               <section className="club-card">
-                <h2 className="font-heading text-3xl">Finish & save</h2>
+                <h2
+                  ref={saveHeading}
+                  tabIndex={-1}
+                  className="font-heading text-3xl"
+                >
+                  Save results to Google Drive
+                </h2>
                 <fieldset disabled={busy}>
                   <label className="flex gap-3 mt-5 items-center">
                     <input
@@ -436,39 +486,108 @@ export default function PouleTracker() {
                     />
                     Count towards The Wheel Tournament
                   </label>
-                  <p className="text-sm text-grey-dark mt-5">
-                    Save using a Google account with permission to edit the club&apos;s poule results folder. To request access, please contact murphe80@tcd.ie
-                  </p>
-                  {connected && (
-                    <button
-                      className="underline text-sm mt-3"
-                      type="button"
-                      onClick={async () => {
-                        const response = await fetch(
-                          '/api/auth/google/disconnect',
-                          { method: 'POST' },
-                        )
-                        if (response.ok) {
-                          setConnected(false)
-                          setMessage('Google disconnected from this browser.')
-                        } else
-                          setMessage('Could not disconnect. Please try again.')
-                      }}
+                  <label className="block mt-5 font-semibold">
+                    Save destination
+                    <select
+                      className="club-input font-normal"
+                      value={destination}
+                      onChange={(e) =>
+                        setDestination(e.target.value as SaveDestination)
+                      }
                     >
-                      Disconnect Google
-                    </button>
-                  )}
-                  <button
-                    className="club-button mt-6 w-full"
-                    disabled={busy || complete !== poule.bouts.length}
-                    onClick={save}
-                  >
-                    {busy
-                      ? 'Saving…'
-                      : connected
-                        ? 'Save results to Drive'
-                        : 'Connect Google to save results'}
-                  </button>
+                      <option value="personal">My personal Google Drive</option>
+                      <option value="club">Club results folders</option>
+                      <option value="both">Both personal and club Drive</option>
+                    </select>
+                  </label>
+                  <p className="text-sm text-grey-dark mt-3">
+                    {destination === 'personal'
+                      ? 'Both files go into your My Drive. They are not shared with the club and do not update the league.'
+                      : 'Eligible club results update the league.'}
+                  </p>
+                  <ol className="mt-6 space-y-5">
+                    <li className="border border-black/10 rounded-lg p-4">
+                      <h3 className="font-semibold">
+                        1. Connect your Google account
+                      </h3>
+                      <p className="text-sm text-grey-dark mt-2">
+                        This gives the website permission to upload. 
+                      </p>
+                      <button
+                        className="club-secondary mt-3"
+                        type="button"
+                        disabled={
+                          busy || connected || complete !== poule.bouts.length
+                        }
+                        onClick={save}
+                      >
+                        {connected ? '✓ Google connected' : '1. Connect Google'}
+                      </button>
+                      {connected && (
+                        <button
+                          className="underline text-sm block mt-3"
+                          type="button"
+                          onClick={async () => {
+                            const response = await fetch(
+                              '/api/auth/google/disconnect',
+                              { method: 'POST' },
+                            )
+                            if (response.ok) {
+                              setConnected(false)
+                              setMessage(
+                                'Google disconnected from this browser.',
+                              )
+                            } else
+                              setMessage(
+                                'Could not disconnect. Please try again.',
+                              )
+                          }}
+                        >
+                          Disconnect Google
+                        </button>
+                      )}
+                    </li>
+                    <li className="border border-black/10 rounded-lg p-4">
+                      <h3 className="font-semibold">2. Save your results</h3>
+                      <p className="text-sm text-grey-dark mt-2">
+                        After connecting, press the button below to upload the
+                        results files. 
+                      </p>
+                      <p role="status" className="club-notice mt-4">
+                        {saveStage ||
+                          (savedToDrive
+                            ? `✓ Saved successfully! Your results are in ${destinationLabels[destination]}.`
+                            : connected
+                              ? 'Google is connected. Save results below.'
+                              : 'Your results are not saved to Drive. Connect Google first, then complete step 2.')}
+                      </p>
+                      <button
+                        className="club-button mt-4 w-full"
+                        type="button"
+                        disabled={
+                          busy ||
+                          !connected ||
+                          savedToDrive ||
+                          complete !== poule.bouts.length
+                        }
+                        onClick={save}
+                      >
+                        {savedToDrive
+                          ? '✓ Results saved'
+                          : '2. Save results to Drive'}
+                      </button>
+                      {complete !== poule.bouts.length && (
+                        <p className="text-sm text-grey-dark mt-3">
+                          Complete all bout scores before connecting and saving.
+                        </p>
+                      )}
+                      {message && (
+                        <p className="text-sm mt-3" aria-live="polite">
+                          {message}
+                        </p>
+                      )}
+                    </li>
+                  </ol>
                 </fieldset>
               </section>
             </div>

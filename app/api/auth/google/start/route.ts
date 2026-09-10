@@ -22,6 +22,7 @@ export async function GET(request: Request) {
         access_type: 'offline',
         prompt: 'consent',
         scope: [DRIVE_SCOPE],
+        include_granted_scopes: false,
         state: nonce,
         code_challenge: codeChallenge,
         code_challenge_method: CodeChallengeMethod.S256,

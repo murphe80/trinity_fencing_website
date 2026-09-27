@@ -49,7 +49,7 @@ export default function TermsOfServicePage() {
           By selecting Save results to Drive, you instruct the website to create
           PDF and JSON copies in your chosen destination. Club folders have public editing access. Personal-only saves do not update the league. Check names, date,
           weapon and scores before saving. There is no approval step. Eligible
-          Wheel results contribute to the public league and weekly archive.
+          Poules Tournament results contribute to the public league and weekly archive.
         </p>
         <p>
           Check the confirmation message after an upload. A failed or

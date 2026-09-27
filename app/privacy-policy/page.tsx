@@ -92,7 +92,7 @@ export default function PrivacyPolicyPage() {
           uploads manually, without an approval step.
         </p>
         <p>
-          If you save to the club folders and select Count towards The Wheel Tournament, eligible
+          If you save to the club folders and select Count towards Poules Tournament, eligible
           results are used for public league standings and weekly winners. These
           pages may show fencer names, scores, rankings, photographs and
           recorded prize information. Make sure participants know how their

@@ -22,6 +22,6 @@ if (parts.weekday === 'Sat' && parts.hour === '10') {
     },
   )
   if (!response.ok)
-    throw new Error(`Wheel publication failed: HTTP ${response.status}`)
+    throw new Error(`Poules Tournament publication failed: HTTP ${response.status}`)
   console.log(await response.text())
 } else console.log('Skipped: outside 10am Dublin publication window.')

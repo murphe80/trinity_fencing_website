@@ -58,11 +58,11 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             Poule Tracker
           </Link>
           <Link
-            href="/tournaments/wheel"
+            href="/tournaments/poules"
             onClick={onClose}
             className="block pl-5 py-3 hover:text-white"
           >
-            The Wheel Tournament
+            Poules Tournament
           </Link>
         </details>
         <details

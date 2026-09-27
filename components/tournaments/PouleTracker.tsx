@@ -199,7 +199,7 @@ export default function PouleTracker() {
       }
       setSavedSnapshot(JSON.stringify({ poule, destination }))
       setMessage(
-        `Saved PDF and JSON to ${destinationLabels[destination]}.${destination === 'personal' ? ' Personal copies do not update the club league.' : ' Eligible Wheel results appear at the next Saturday 10am publication.'}`,
+        `Saved PDF and JSON to ${destinationLabels[destination]}.${destination === 'personal' ? ' Personal copies do not update the club league.' : ' Eligible Poules Tournament results appear at the next Saturday 10am publication.'}`,
       )
     } catch (error) {
       setMessage((error as Error).message)
@@ -484,7 +484,7 @@ export default function PouleTracker() {
                       }
                       className="accent-red w-5 h-5"
                     />
-                    Count towards The Wheel Tournament
+                    Count towards Poules Tournament
                   </label>
                   <label className="block mt-5 font-semibold">
                     Save destination

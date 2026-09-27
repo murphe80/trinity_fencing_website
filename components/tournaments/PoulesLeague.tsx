@@ -13,7 +13,7 @@ import {
   type Poule,
   type Weapon,
 } from '@/lib/tournament'
-export default function WheelLeague({
+export default function PoulesLeague({
   poules,
   photos,
   cutoff,
@@ -25,8 +25,7 @@ export default function WheelLeague({
   unavailable: boolean
 }) {
   const [weapon, setWeapon] = useState<Weapon>('foil'),
-    [week, setWeek] = useState('all'),
-    [rotation, setRotation] = useState(0)
+    [week, setWeek] = useState('all')
   const router = useRouter()
   useEffect(() => {
     const timer = setInterval(() => {
@@ -70,10 +69,10 @@ export default function WheelLeague({
   return (
     <>
       <section className="relative bg-black text-white pt-28 pb-16 overflow-hidden">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-[1.5fr_1fr] gap-10 items-center">
+        <div className="max-w-6xl mx-auto px-6">
           <div>
             <h1 className="font-heading text-6xl md:text-8xl mt-5">
-              The Wheel
+              Poules
               <br />
               <span className="italic text-gold">Tournament</span>
             </h1>
@@ -89,27 +88,6 @@ export default function WheelLeague({
             >
               Start a poule ↗
             </a>
-          </div>
-          <div className="text-center">
-            <button
-              onClick={() =>
-                setRotation((r) => r + 180 + Math.floor(Math.random() * 360))
-              }
-              aria-label="Spin the decorative wheel"
-              className="relative rounded-full w-56 h-56 sm:w-72 sm:h-72 border-8 border-gold shadow-2xl mx-auto transition-transform duration-1000"
-              style={{
-                transform: `rotate(${rotation}deg)`,
-                background:
-                  'conic-gradient(#C8102E 0deg 60deg,#F9F6F1 60deg 120deg,#1A1A1A 120deg 180deg,#C8102E 180deg 240deg,#F9F6F1 240deg 300deg,#1A1A1A 300deg 360deg)',
-              }}
-            >
-              <span className="absolute inset-0 m-auto w-24 h-24 rounded-full border-4 border-gold bg-black flex items-center justify-center font-heading text-2xl">
-                DUFC
-              </span>
-            </button>
-            <p className="mt-6 text-xs text-white/60">
-              Give it a spin! The real wheel decides Friday’s challenge
-            </p>
           </div>
         </div>
       </section>
@@ -259,7 +237,7 @@ export default function WheelLeague({
                 </p>
                 <div className="border-t border-black/10 mt-5 pt-5">
                   <p className="text-xs uppercase tracking-widest text-red">
-                    The wheel’s choice
+                    Weekly prize
                   </p>
                   <p className="font-heading text-2xl mt-2">
                     {p.prize || 'Prize not recorded'}

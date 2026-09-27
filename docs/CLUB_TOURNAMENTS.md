@@ -1,6 +1,6 @@
 # Club policies and tournaments
 
-The site now has a DUFC crest favicon, a featured-event banner, `/policies`, `/tournaments/poule-tracker`, and `/tournaments/wheel`. These routes use the existing cream, red, black and Garamond design.
+The site now has a DUFC crest favicon, a featured-event banner, `/policies`, `/tournaments/poule-tracker`, and `/tournaments/poules`. These routes use the existing cream, red, black and Garamond design.
 
 ## Hosting setup (Render or Vercel)
 
@@ -38,15 +38,17 @@ Enter 2–20 unique full names, a weapon and date. The tracker uses round-robin 
 
 Poule ranks use victory ratio, indicator, then touches scored. Exactly tied leaders share the poule win. League ranks use only cumulative indicator, as requested; alphabetical display order does not break equal ranks. The fun prize does not affect league points.
 
-Tick “Count towards The Wheel Tournament” to include eligible saved results. Wheel prize and winner entry is not part of the tracker, and upload processing clears this legacy metadata. Submission requires a complete valid poule and a connected Google account. Totals are recalculated from bouts. Files include the date and weapon in their names.
+Tick “Count towards Poules Tournament” to include eligible saved results. Tournament prize and winner entry is not part of the tracker, and upload processing clears this legacy metadata. Submission requires a complete valid poule and a connected Google account. Totals are recalculated from bouts. Files include the date and weapon in their names.
 
-## The Wheel Tournament
+## Poules Tournament
+
+The old `/tournaments/wheel` URL permanently redirects to `/tournaments/poules`. The stored `wheel` eligibility field and existing cache/cron identifiers are retained for compatibility with saved results and deployment configuration.
 
 The season begins Friday **18 September 2026**, spans 12 weeks and ends with Friday **4 December 2026**. Its final scheduled publication is Saturday **5 December**. The season is currently defined in `lib/tournament.ts`; change the season dates there for a later tournament.
 
-Every Saturday at **10:00 Europe/Dublin**, completed Wheel poules saved before the cutoff enter the league and weekly archive. The publication is cached for that weekly cutoff and the scheduled job warms it. A first visit after the cutoff also generates it if the cron was delayed. Open league pages check each minute for the new publication. Corrections saved after the cutoff appear at the following publication. Any eligible result date in a season week contributes; non-Wheel poules do not. Multiple poules per weapon/week each have a weekly winners card.
+Every Saturday at **10:00 Europe/Dublin**, completed tournament poules saved before the cutoff enter the league and weekly archive. The publication is cached for that weekly cutoff and the scheduled job warms it. A first visit after the cutoff also generates it if the cron was delayed. Open league pages check each minute for the new publication. Corrections saved after the cutoff appear at the following publication. Any eligible result date in a season week contributes; poules not marked for the tournament do not. Multiple poules per weapon/week each have a weekly winners card.
 
-Place participant PNGs directly in the photo folder as `firstname_lastname.png`, matching the full name used in poules (spaces become underscores, case ignored). Keep spelling consistent; different people with the same name need distinct full names and corresponding filenames. Initials are shown when a photo is missing. The on-page wheel is decorative and does not choose or record the real prize.
+Place participant PNGs directly in the photo folder as `firstname_lastname.png`, matching the full name used in poules (spaces become underscores, case ignored). Keep spelling consistent; different people with the same name need distinct full names and corresponding filenames. Initials are shown when a photo is missing.
 
 ## Local development and checks
 

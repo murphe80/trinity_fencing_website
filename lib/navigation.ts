@@ -6,7 +6,7 @@ export const PRIMARY_LINKS = [
 ]
 export const TOURNAMENT_LINKS = [
   { href: '/tournaments/poule-tracker', label: 'Poule Tracker' },
-  { href: '/tournaments/wheel', label: 'The Wheel Tournament' },
+  { href: '/tournaments/poules', label: 'Poules Tournament' },
 ]
 export const MORE_LINKS = [
   { href: '/policies', label: 'Policies' },

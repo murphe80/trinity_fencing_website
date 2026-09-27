@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     const results = await publishedResults(publicationCutoff(now))
     return NextResponse.json({ updated: true, poules: results.length })
   } catch (error) {
-    console.error('Wheel refresh failed:', googleErrorSummary(error))
+    console.error('Poules Tournament refresh failed:', googleErrorSummary(error))
     return NextResponse.json(
       { error: 'Drive refresh failed.' },
       { status: 503 },
